@@ -1,5 +1,10 @@
 import openpyxl
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask_cors import CORS
 from Estoque import get_positive_int_input
+
+app = Flask(__name__)
+app.secret_key = 'your_secret_key'
 
 def load_workbook_safe(storage_xlsx):
     try:
@@ -153,4 +158,4 @@ def main(cart, subtotal):
 
 
 if __name__ == "__main__":
-    main([], 0.0)
+    app.run(debug=True)

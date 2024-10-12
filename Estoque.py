@@ -1,5 +1,10 @@
 import openpyxl
 from datetime import datetime, timedelta
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask_cors import CORS
+
+app = Flask(__name__)
+app.secret_key = 'your_secret_key'
 
 def get_positive_float_input(message):
     while True:
@@ -221,4 +226,4 @@ def main():
             print("Opção inválida!")
 
 if __name__ == "__main__":
-    main()
+    app.run(debug=True)
