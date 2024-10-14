@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>Home</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Bem-vindo à Tela de Login</h1>
+        <form method="post" action="{{ url_for('login') }}" onsubmit="handleSubmit(event);">
+            <label for="login">Nome de Usuário:</label>
+            <input type="text" id="login" name="login" required minlength="5" pattern="[a-zA-Z0-9]+" placeholder="Digite seu nome de usuário">
+            
+            <label for="password">Senha:</label>
+            <input type="password" id="password" name="password" required minlength="8" placeholder="Digite sua senha">
+            
+            <input type="submit" value="Login">
+            <button type="button" onclick="window.location.href='{{ url_for('register') }}';">Registrar</button>
+        </form>
+        <a href="{{ url_for('recovery') }}">Recuperar senha</a>
+    </div>
+
     <script>
         function showMessage(message) {
             alert(message);
@@ -14,6 +31,9 @@
             event.preventDefault();
 
             const form = event.target;
+            const loginInput = document.getElementById('login');
+            loginInput.value = loginInput.value.toLowerCase();
+
             const formData = new FormData(form);
 
             fetch(form.action, {
@@ -40,21 +60,5 @@
             .catch(error => console.error('Error:', error));
         }
     </script>
-</head>
-<body>
-    <div class="container">
-        <h1>Bem-vindo à Tela de Login</h1>
-        <form method="post" action="{{ url_for('login') }}" onsubmit="handleSubmit(event);">
-            <label for="login">Nome de Usuário:</label>
-            <input type="text" id="login" name="login" required minlength="5" pattern="[a-zA-Z0-9]+" placeholder="Digite seu nome de usuário">
-            
-            <label for="password">Senha:</label>
-            <input type="password" id="password" name="password" required minlength="8" placeholder="Digite sua senha">
-            
-            <input type="submit" value="Login">
-            <button type="button" onclick="window.location.href='{{ url_for('register') }}';">Registrar</button>
-        </form>
-        <a href="{{ url_for('recovery') }}">Recuperar senha</a>
-    </div>
 </body>
 </html>
