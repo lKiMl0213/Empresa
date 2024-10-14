@@ -46,7 +46,7 @@
         <h1>Bem-vindo à Tela de Login</h1>
         <form method="post" action="{{ url_for('login') }}" onsubmit="handleSubmit(event);">
             <label for="login">Nome de Usuário:</label>
-            <input type="text" id="login" name="login" required minlength="5" pattern="[a-z0-9]+" placeholder="Digite seu nome de usuário">
+            <input type="text" id="login" name="login" required minlength="5" pattern="[a-zA-Z0-9]+" placeholder="Digite seu nome de usuário">
             
             <label for="password">Senha:</label>
             <input type="password" id="password" name="password" required minlength="8" placeholder="Digite sua senha">
