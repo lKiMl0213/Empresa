@@ -81,7 +81,7 @@
             .then(data => {
                 if (data.success) {
                     showMessage("Usuário registrado com sucesso!");
-                    window.location.href = '{{ url_for('home') }}'; // Redireciona para a página inicial
+                    window.location.href = '{{ url_for('home') }}';
                 } else {
                     showMessage("Erro ao registrar usuário: " + data.message);
                 }

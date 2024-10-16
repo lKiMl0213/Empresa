@@ -1,8 +1,8 @@
 import json
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 import datetime
-from flask_cors import CORS
 from flask_mysqldb import MySQL
+from passlib.hash import scrypt
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -14,7 +14,7 @@ app.config['MYSQL_DB'] = 'users_db'
 
 mysql = MySQL(app)
 
-def register_user(login, password, name, birthday, cpf, email, user_type):
+def register_user(login, hashed_password, name, birthday, cpf, email, user_type):
     cursor = mysql.connection.cursor()
     cursor.execute("SELECT * FROM users WHERE login = %s OR email = %s", (login, email))
     existing_user = cursor.fetchone()
@@ -22,11 +22,11 @@ def register_user(login, password, name, birthday, cpf, email, user_type):
     if existing_user:
         if existing_user[1] == login:
             return "Login já em uso"
-        elif existing_user[2] == email:
+        elif existing_user[6] == email:
             return "Email já em uso"
     
     cursor.execute("INSERT INTO users(login, password, name, birthday, cpf, email, type) VALUES (%s, %s, %s, %s, %s, %s, %s)", 
-                   (login, password, name, birthday, cpf, email, user_type))
+                   (login, hashed_password, name, birthday, cpf, email, user_type))
     mysql.connection.commit()
     cursor.close()
     return "Usuário registrado com sucesso"
@@ -40,7 +40,7 @@ def recovery():
         user = cursor.fetchone()
         cursor.close()
         if user:
-            # coloca aqui a lógica para enviar o email se quiser se n fdc kkkkk
+            # se quiser q envie email faz aq, se n quiser fdc
             return jsonify(success=True)
         else:
             return jsonify(success=False)
@@ -50,14 +50,22 @@ def recovery():
 def login():
     login = request.form['login']
     password = request.form['password']
+
     cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM users WHERE login = %s AND password = %s", (login, password))
+    cursor.execute("SELECT * FROM users WHERE login = %s", (login,))
     user = cursor.fetchone()
     cursor.close()
+    
     if user:
-        return user_type(user, login)
+        stored_hash = user[2]
+        if scrypt.verify(password, stored_hash):
+            return user_type(user, login)
+        else:
+            print("Senha incorreta.")
     else:
-        return jsonify(success=False)
+        print("Usuário não encontrado.")
+    
+    return jsonify(success=False, message="Login ou senha inválidos.")
 
 def user_type(user, login):
     if len(user) < 8:
@@ -83,11 +91,11 @@ def storage():
     users_db = cursor.fetchall()
     cursor.close()
     
+    user_name = "Nome não encontrado"
     for user in users_db:
         if user[7] == "storage":
             user_name = user[3]
-        else:
-            user_name = "Nome não encontrado"    
+            break
 
     return render_template('storage.html', user=user_name)
 
@@ -98,18 +106,33 @@ def products():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        login = request.form['login']
-        password = request.form['password']
-        name = request.form['name']
-        day = request.form['day']
-        month = request.form['month']
-        year = request.form['year']
-        cpf = request.form['cpf']
-        email = request.form['email']
-        type = request.form['type']
-        message = register_user(login, password, name, f"{year}-{str(month).zfill(2)}-{str(day).zfill(2)}", email, cpf, type)
-        flash(message)
-        return redirect(url_for('home'))
+        login = request.form.get('login')
+        password = request.form.get('password')
+        name = request.form.get('name')
+        day = request.form.get('day')
+        month = request.form.get('month')
+        year = request.form.get('year')
+        cpf = request.form.get('cpf')
+        email = request.form.get('email')
+        user_type = request.form.get('type')
+
+        
+        hashed_password = scrypt.hash(password)
+                
+        if not all([login, password, name, day, month, year, cpf, email, user_type]):
+            return jsonify(success=False, message="Todos os campos são obrigatórios.")
+        
+        birthday = f"{year}-{str(month).zfill(2)}-{str(day).zfill(2)}"
+
+        try:
+            message = register_user(login, hashed_password, name, birthday, cpf, email, user_type)
+            if message == "Usuário registrado com sucesso":
+                return jsonify(success=True)
+            else:
+                return jsonify(success=False, message=message)
+        except Exception as e:
+            return jsonify(success=False, message=f"Ocorreu um erro: {str(e)}")
+
     return render_template('register.html', datetime=datetime)
 
 if __name__ == "__main__":
