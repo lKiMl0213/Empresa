@@ -36,13 +36,12 @@
     </script>
 </head>
 <body>
-    <div class="container">
+    <div class="container-recovery">
         <h1>Recuperar Senha</h1>
         <form method="post" action="{{ url_for('recovery') }}" onsubmit="handleSubmit(event)">
-            <label for="login">Nome de Usuário ou Email:</label>
-            <input type="text" id="login" name="login" required minlength="5" placeholder="Digite seu nome de usuário ou email">
+            <input type="text" id="login" name="login" required minlength="5" placeholder="Insira seu nome de usuário/email">
             
-            <input type="submit" value="Recuperar senha">
+            <input type="submit" value="Recuperar">
         </form>
         <a href="{{ url_for('home') }}">Voltar</a>
     </div>

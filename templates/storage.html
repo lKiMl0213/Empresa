@@ -2,12 +2,108 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>Estoque</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-    <h1>Bem-vindo à Tela de Estoque</h1>
-    <a href="{{ url_for('home') }}">Voltar para a tela inicial</a>
+<body class="storage-page"> <!-- Adicionado class .storage-page -->
+    <div class="upper-bar">
+        <button onclick="showForm('addProductForm')">Adicionar Produtos</button>
+        <button onclick="showForm('removeProductForm')">Remover Produtos</button>
+        <button onclick="showForm('updateProductForm')">Atualizar Produtos</button>
+        <button onclick="showForm('viewProducts')">Ver Produtos</button>
+    </div> 
+
+    <div class="welcome-section">
+        <h1>Bem-vindo {{ user }} ao Estoque</h1> 
+        <button onclick="window.location.href='{{ url_for('home') }}';">Sair</button>
+    </div>
+    <div id="formContainer" style="display: none;">
+        <div id="addProductForm" class="form" style="display:none;">
+            <h2>Adicionar Produto</h2>
+            <form id="addProduct" onsubmit="submitForm(event, '/products/add');">
+                <label for="productName">Nome do Produto:</label>
+                <input type="text" id="productName" name="productName" required>
+                <input type="submit" value="Adicionar">
+            </form>
+        </div>
+        <div id="removeProductForm" class="form" style="display:none;">
+            <h2>Remover Produto</h2>
+            <form id="removeProduct" onsubmit="submitForm(event, '/products/remove');">
+                <label for="productId">ID do Produto:</label>
+                <input type="text" id="productId" name="productId" required>
+                <input type="submit" value="Remover">
+            </form>
+        </div>
+
+        <div id="updateProductForm" class="form" style="display:none;">
+            <h2>Atualizar Produto</h2>
+            <form id="updateProduct" onsubmit="submitForm(event, '/products/update');">
+                <label for="updateProductId">ID do Produto:</label>
+                <input type="text" id="updateProductId" name="updateProductId" required>
+                <label for="updateProductName">Novo Nome:</label>
+                <input type="text" id="updateProductName" name="updateProductName" required>
+                <input type="submit" value="Atualizar">
+            </form>
+        </div>
+
+        <div id="viewProducts" class="form" style="display:none;">
+            <h2>Produtos</h2>
+            <div id="productList"></div>
+        </div>
+    </div>
+
+    <script>
+        function showForm(formId) {
+            // Oculta todos os formulários
+            $('.form').hide();
+            // Exibe o formulário selecionado
+            $('#' + formId).show();
+            // Exibe o contêiner do formulário
+            $('#formContainer').show();
+        }
+
+        function submitForm(event, actionUrl) {
+            event.preventDefault(); // Impede o envio normal do formulário
+
+            const formData = $(event.target).serialize(); // Obtém os dados do formulário
+
+            $.ajax({
+                type: 'POST',
+                url: actionUrl,
+                data: formData,
+                success: function(response) {
+                    // Aqui você pode adicionar lógica para manipular a resposta
+                    alert(response.message);
+                    loadProducts(); // Recarrega a lista de produtos
+                },
+                error: function(error) {
+                    alert("Erro ao processar a requisição.");
+                }
+            });
+        }
+
+        function loadProducts() {
+            $.ajax({
+                url: '/products',
+                type: 'GET',
+                success: function(products) {
+                    let productList = $('#productList');
+                    productList.empty(); // Limpa a lista antes de adicionar
+                    products.forEach(product => {
+                        productList.append('<div>' + product.name + ' (ID: ' + product.id + ')</div>');
+                    });
+                },
+                error: function(error) {
+                    alert("Erro ao carregar produtos.");
+                }
+            });
+        }
+
+        // Carrega a lista de produtos ao iniciar a página
+        $(document).ready(function() {
+            loadProducts();
+        });
+    </script>
 </body>
 </html>

@@ -2,97 +2,98 @@ import json
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 import datetime
 from flask_cors import CORS
+from flask_mysqldb import MySQL
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-def initialize_users_db():
-    default_data = []
-    with open('users.json', 'w') as file:
-        json.dump(default_data, file)
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'Fortrek.1'
+app.config['MYSQL_DB'] = 'users_db'
 
-def load_users_db():
-    try:
-        with open('users.json', 'r') as file:
-            content = file.read()
-            data = json.loads(content)
-            return data
-    except Exception as e:
-        initialize_users_db()
-        return []
+mysql = MySQL(app)
 
-def save_users_db(users):
-    with open('users.json', 'w') as file:
-        json.dump(users, file)
+def register_user(login, password, name, birthday, cpf, email, user_type):
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM users WHERE login = %s OR email = %s", (login, email))
+    existing_user = cursor.fetchone()
 
-def register_user(login, password, name, birthday, email, type):
-    users_db = load_users_db()
-    if any(user["login"] == login for user in users_db):
-        return "Usuário já em uso"
-    elif any(user["email"] == email for user in users_db):
-        return "Email já em uso"
-    else:
-        users_db.append({
-            "login": login,
-            "password": password,
-            "name": name,
-            "birthday": birthday,
-            "email": email,
-            "type": type
-        })
-        save_users_db(users_db)
-        return "Usuário registrado com sucesso!"
+    if existing_user:
+        if existing_user[1] == login:
+            return "Login já em uso"
+        elif existing_user[2] == email:
+            return "Email já em uso"
     
+    cursor.execute("INSERT INTO users(login, password, name, birthday, cpf, email, type) VALUES (%s, %s, %s, %s, %s, %s, %s)", 
+                   (login, password, name, birthday, cpf, email, user_type))
+    mysql.connection.commit()
+    cursor.close()
+    return "Usuário registrado com sucesso"
+
 @app.route('/recovery', methods=['GET', 'POST'])
 def recovery():
     if request.method == 'POST':
         login_or_email = request.form['login']
-        users_db = load_users_db()
-        user = next((user for user in users_db if user["login"] == login_or_email or user["email"] == login_or_email), None)
-
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT * FROM users WHERE login = %s OR email = %s", (login_or_email, login_or_email))
+        user = cursor.fetchone()
+        cursor.close()
         if user:
             # coloca aqui a lógica para enviar o email se quiser se n fdc kkkkk
             return jsonify(success=True)
         else:
             return jsonify(success=False)
-
     return render_template('recovery.html')
 
-    
 @app.route('/login', methods=['POST'])
 def login():
     login = request.form['login']
     password = request.form['password']
-    users_db = load_users_db()
-    user = next((user for user in users_db if user["login"] == login), None)
-
-    if user and user["password"] == password:
-        return user_type(user)
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM users WHERE login = %s AND password = %s", (login, password))
+    user = cursor.fetchone()
+    cursor.close()
+    if user:
+        return user_type(user, login)
     else:
         return jsonify(success=False)
 
-def user_type(user):
-    if 'type' not in user:
+def user_type(user, login):
+    if len(user) < 8:
         return jsonify(success=False, message="Tipo de usuário não encontrado.")
-    return jsonify(success=True, user_type=user["type"])
+    return jsonify(success=True, user_type=user[7], login=login)
 
 @app.route('/rh', methods=['POST', 'GET'])
 def rh():
-    #return redirect(url_for('rh')) tenhoq ver como fazer isso
     return render_template('rh.html')
 
-@app.route('/storage', methods=['POST', 'GET'])
-def storage():
-    #return redirect(url_for('storage')) tenhoq ver como fazer isso
-    return render_template('storage.html')
 @app.route('/market', methods=['POST', 'GET'])
 def market():
-    #return redirect(url_for('market')) tenhoq ver como fazer isso
     return render_template('market.html')
 
 @app.route('/')
 def home():
     return render_template('home.html')
+
+@app.route('/storage', methods=['POST', 'GET'])
+def storage():
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM users")
+    users_db = cursor.fetchall()
+    cursor.close()
+    
+    for user in users_db:
+        if user[7] == "storage":
+            user_name = user[3]
+        else:
+            user_name = "Nome não encontrado"    
+
+    return render_template('storage.html', user=user_name)
+
+@app.route('/products', methods=['GET', 'POST'])
+def products():
+    return render_template('products.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -103,9 +104,10 @@ def register():
         day = request.form['day']
         month = request.form['month']
         year = request.form['year']
+        cpf = request.form['cpf']
         email = request.form['email']
         type = request.form['type']
-        message = register_user(login, password, name, f"{day}/{month}/{year}", email, type)
+        message = register_user(login, password, name, f"{year}-{str(month).zfill(2)}-{str(day).zfill(2)}", email, cpf, type)
         flash(message)
         return redirect(url_for('home'))
     return render_template('register.html', datetime=datetime)
