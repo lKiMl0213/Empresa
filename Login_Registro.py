@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 import datetime
 from flask_mysqldb import MySQL
 from passlib.hash import scrypt
-
+from Estoque import *
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
@@ -134,6 +134,7 @@ def register():
             return jsonify(success=False, message=f"Ocorreu um erro: {str(e)}")
 
     return render_template('register.html', datetime=datetime)
+
 
 if __name__ == "__main__":
     app.run(debug=True)

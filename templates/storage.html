@@ -6,27 +6,58 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body class="storage-page"> <!-- Adicionado class .storage-page -->
+<body class="storage-page">
     <div class="upper-bar">
         <button onclick="showForm('addProductForm')">Adicionar Produtos</button>
         <button onclick="showForm('removeProductForm')">Remover Produtos</button>
         <button onclick="showForm('updateProductForm')">Atualizar Produtos</button>
         <button onclick="showForm('viewProducts')">Ver Produtos</button>
-    </div> 
+    </div>
 
     <div class="welcome-section">
         <h1>Bem-vindo {{ user }} ao Estoque</h1> 
         <button onclick="window.location.href='{{ url_for('home') }}';">Sair</button>
     </div>
-    <div id="formContainer" style="display: none;">
+
+    <div id="formContainer-products" style="display: none;">
         <div id="addProductForm" class="form" style="display:none;">
             <h2>Adicionar Produto</h2>
             <form id="addProduct" onsubmit="submitForm(event, '/products/add');">
+                <label for="barcode">Código de barras:</label>
+                <input type="text" id="barcode" name="barcode" required>
                 <label for="productName">Nome do Produto:</label>
                 <input type="text" id="productName" name="productName" required>
+                <label for="buyPrice">Preço de compra:</label>
+                <input type="number" id="buyPrice" name="buyPrice" required step="0.01" min="0">
+                <label for="sellPrice">Preço de venda:</label>
+                <input type="number" id="sellPrice" name="sellPrice" required step="0.01" min="0">
+                <label for="productQuantity">Quantidade do Produto:</label>
+                <input type="number" id="productQuantity" name="productQuantity" required step="1" min="0">
+                <label for="expirationDate">Data de validade:</label>
+                <div class="select-container-data" required>
+                    <select name="month" required>
+                        <option value="">Mês</option>
+                        {% set months = {
+                            1: "Janeiro", 2: "Fevereiro", 3: "Março",
+                            4: "Abril", 5: "Maio", 6: "Junho",
+                            7: "Julho", 8: "Agosto", 9: "Setembro",
+                            10: "Outubro", 11: "Novembro", 12: "Dezembro"
+                        } %}
+                        {% for month in range(1, 13) %}
+                            <option value="{{ "%02d"|format(month) }}">{{ months[month] }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="year" required>
+                        <option value="">Ano</option>
+                        {% for year in range(2022, 2032) %}
+                        <option value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
                 <input type="submit" value="Adicionar">
             </form>
         </div>
+
         <div id="removeProductForm" class="form" style="display:none;">
             <h2>Remover Produto</h2>
             <form id="removeProduct" onsubmit="submitForm(event, '/products/remove');">
@@ -55,12 +86,12 @@
 
     <script>
         function showForm(formId) {
+            // Exibe o contêiner do formulário
+            $('#formContainer-products').show();
             // Oculta todos os formulários
             $('.form').hide();
             // Exibe o formulário selecionado
             $('#' + formId).show();
-            // Exibe o contêiner do formulário
-            $('#formContainer').show();
         }
 
         function submitForm(event, actionUrl) {
