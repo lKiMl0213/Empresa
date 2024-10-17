@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='recovery.css') }}">
     <title>Recuperar Senha</title>
     <script>
         function showMessage(message) {
@@ -17,33 +18,35 @@
             const formData = new FormData(form);
 
             fetch(form.action, {
-                method: form.method,
-                body: formData,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showMessage("Instruções para recuperação de senha foram enviadas para seu email.");
-                } else {
-                    showMessage("Usuário não encontrado");
-                }
-            })
-            .catch(error => console.error('Error:', error));
+                    method: form.method,
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showMessage("Instruções para recuperação de senha foram enviadas para seu email.");
+                    } else {
+                        showMessage("Usuário não encontrado");
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         }
     </script>
 </head>
+
 <body>
     <div class="container-recovery">
         <h1>Recuperar Senha</h1>
         <form method="post" action="{{ url_for('recovery') }}" onsubmit="handleSubmit(event)">
             <input type="text" id="login" name="login" required minlength="5" placeholder="Insira seu nome de usuário/email">
-            
+
             <input type="submit" value="Recuperar">
         </form>
         <a href="{{ url_for('home') }}">Voltar</a>
     </div>
 </body>
+
 </html>

@@ -1,0 +1,154 @@
+/* Estilo geral para a página de registro */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Contêiner principal da página de registro */
+.container-register {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 50px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0);
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.container-register h1 {
+    font-size: 40px;
+    margin-bottom: 50px;
+    margin-top: 10px;
+}
+
+/* Estilos para os inputs de texto e senha */
+.login-pass-input {
+    display: flex;
+    align-items: center;
+}   
+.login-pass-input label {
+    width: 15%;
+}
+
+.login-pass-input input {
+    width: 40%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 15px;
+    border: 1px solid #ced4da;
+    box-sizing: border-box;
+    text-align: center;
+}
+.name-cpf-input {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}   
+.name-cpf-input label {
+    width: 100%;
+    margin-bottom: 5px;
+}
+.name-cpf-input input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 15px;
+    border: 1px solid #ced4da;
+    box-sizing: border-box;
+    text-align: center;
+}
+.email-input {
+    align-items: center;
+}
+.email-input label {
+    width: 100%;
+}
+.email-input input {
+width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 15px;
+    border: 1px solid #ced4da;
+    box-sizing: border-box;
+    text-align: center;
+}
+.type-input {
+    display: flex;
+    align-items: center;
+}
+.type-input label {
+    width: 40%;
+}
+.type-input select {
+    width: 60%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 30px;
+    border: 1px solid #ced4da;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+/* Estilo para o botão de envio */
+.container-register input[type="submit"] {
+    width: 50%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.container-register input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Estilo para os labels */
+.container-register label {
+    display: block;
+    text-align: left;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+}
+
+/* Contêiner para selects de data de nascimento */
+.select-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.select-container select {
+    width: 32%;
+    padding: 10px;
+    border-radius: 30px;
+    border: 1px solid #ced4da;
+}
+
+/* Contêiner flex para os botões */
+.register-buttons {
+    display: flex;
+    gap: 150px;
+}
+.container-register button {
+    width: 50%;
+    padding: 12px;
+    background-color: #ff0000;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.container-register button:hover {
+    background-color: #b30000;
+}

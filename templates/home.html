@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
     <title>Home</title>
 </head>
+
 <body>
     <div class="container-login">
         <h1>Empresa</h1>
         <form method="post" action="{{ url_for('login') }}" onsubmit="handleSubmit(event);">
             <input type="text" id="login" name="login" required minlength="5" pattern="[a-zA-Z0-9]+" placeholder="Digite seu nome de usuário">
             <input type="password" id="password" name="password" required minlength="8" placeholder="Digite sua senha">
-            <input type="submit" value="Login">
-            <button type="button" onclick="window.location.href='{{ url_for('register') }}';">Registrar</button>
+            <div class="login-buttons">
+                <input type="submit" value="Login">
+                <button type="button" onclick="window.location.href='{{ url_for('register') }}';">Registrar-se</button>
+            </div>
         </form>
         <a href="{{ url_for('recovery') }}">Recuperar senha</a>
     </div>
@@ -33,28 +37,29 @@
             const formData = new FormData(form);
 
             fetch(form.action, {
-                method: form.method,
-                body: formData,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    if (data.user_type === 'rh') {
-                        window.location.href = '/rh';
-                    } else if (data.user_type === 'storage') {
-                        window.location.href = '/storage';
-                    } else {
-                        window.location.href = '/market';
+                    method: form.method,
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
                     }
-                } else {
-                    showMessage("Usuário/senha incorretos");
-                }
-            })
-            .catch(error => console.error('Error:', error));
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.user_type === 'rh') {
+                            window.location.href = '/rh';
+                        } else if (data.user_type === 'storage') {
+                            window.location.href = '/storage';
+                        } else {
+                            window.location.href = '/market';
+                        }
+                    } else {
+                        showMessage("Usuário/senha incorretos");
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         }
     </script>
 </body>
+
 </html>

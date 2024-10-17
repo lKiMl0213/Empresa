@@ -1,0 +1,84 @@
+/* Estilo geral para a página de login */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Contêiner principal da página de login */
+.container-login {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 50px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+.container-login h1 {
+    font-size: 40px;
+    margin-top: 10px;
+}
+
+/* Estilos para os inputs de login e senha */
+.container-login input[type="text"],
+.container-login input[type="password"] {
+    width: 90%;
+    padding: 10px;
+    margin-bottom: 30px;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+/* Contêiner flex para os botões */
+.login-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+.container-login input[type="submit"] {
+    width: 40%;
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+}
+
+.container-login input[type="submit"]:hover {
+    background-color: #218838;
+}
+
+/* Estilo para o botão de registro */
+.container-login button {
+    width: 40%;
+    padding: 10px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+}
+
+.container-login button:hover {
+    background-color: #0056b3;
+}
+
+/* Link para recuperação de senha */
+.container-login a {
+    display: block;
+    margin-top: 20px;
+    color: #007BFF;
+    text-decoration: none;
+}
+
+.container-login a:hover {
+    text-decoration: underline;
+}

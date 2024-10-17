@@ -1,0 +1,105 @@
+/* Estilos globais para a página */
+.storage-page {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    padding: 20px;
+}
+
+/* Barra superior com os botões de ação */
+.upper-bar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.upper-bar button {
+    padding: 10px 15px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.upper-bar button:hover {
+    background-color: #0056b3;
+}
+
+/* Seção de boas-vindas */
+.welcome-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.welcome-section h1 {
+    font-size: 24px;
+    color: #333;
+}
+
+.welcome-section button {
+    padding: 10px 20px;
+    background-color: #DC3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.welcome-section button:hover {
+    background-color: #c82333;
+}
+
+/* Contêiner de formulários */
+#formContainer-products {
+    margin-top: 20px;
+}
+
+/* Estilos para os formulários de adicionar, remover e atualizar produtos */
+.form {
+    display: none;
+    border: 1px solid #ccc;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+.form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.form input, .form select {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+/* Contêiner de seleção de data */
+.select-container-data {
+    display: flex;
+    justify-content: space-between;
+}
+
+.select-container-data select {
+    width: 48%;
+}
+
+/* Lista de produtos */
+#productList {
+    margin-top: 20px;
+}
+
+#productList div {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}

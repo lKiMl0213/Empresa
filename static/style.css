@@ -1,21 +1,305 @@
-/* Global Reset */
+/* Global reset para todos os elementos */
 * {
     box-sizing: border-box; /* Inclui padding e border na largura total */
     margin: 0; /* Remove margens padrão */
     padding: 0; /* Remove preenchimentos padrão */
 }
 
-/* Corpo da Página */
+/* Corpo da página */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;/* Global reset para todos os elementos */
+    * {
+        box-sizing: border-box; /* Inclui padding e border na largura total */
+        margin: 0; /* Remove margens padrão */
+        padding: 0; /* Remove preenchimentos padrão */
+    }
+    
+    /* Corpo da página */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #e9ecef; /* Cor de fundo suave */
+        display: flex;
+        flex-direction: column; /* Organiza conteúdo em coluna */
+        align-items: center; /* Centraliza horizontalmente */
+        height: 100vh; /* Ocupa toda a altura da viewport */
+    }
+    
+    /* Barra superior fixa no topo */
+    .upper-bar {
+        width: 100%; /* Largura total da tela */
+        display: flex;
+        justify-content: center; /* Centraliza horizontalmente */
+        align-items: center; /* Centraliza verticalmente */
+        padding: 12px 24px; /* Espaço interno */
+        background-color: #6f42c1; /* Cor de fundo */
+        position: fixed; /* Fixa a barra no topo */
+        top: 0; /* Posição no topo */
+        left: 0;
+        z-index: 1000; /* Certifica-se de que está acima de outros elementos */
+    }
+    
+    /* Estilo para botões na barra superior */
+    .upper-bar button {
+        background-color: #ffffff; /* Cor de fundo */
+        color: #6f42c1; /* Cor do texto */
+        border: none;
+        border-radius: 4px; /* Bordas arredondadas */
+        padding: 12px 16px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 0 8px; /* Espaço lateral entre botões */
+        transition: background-color 0.2s ease;
+    }
+    
+    .upper-bar button:hover {
+        background-color: #5a32a3; /* Cor de fundo ao passar o mouse */
+    }
+    
+    .upper-bar button:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.5); /* Sombra ao focar */
+    }
+    
+    /* Seção de boas-vindas abaixo da barra superior */
+    .welcome-section {
+        text-align: center; /* Centraliza o texto */
+        margin-top: 80px; /* Adiciona espaço para compensar a barra fixa */
+        margin-bottom: 24px;
+    }
+    
+    .welcome-section h1 {
+        margin: 12px 0;
+    }
+    
+    .welcome-section button {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 12px 16px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.2s ease;
+    }
+    
+    .welcome-section button:hover {
+        background-color: #c82333;
+    }
+    
+    .welcome-section button:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.5);
+    }
+    
+    /* Container principal para a tela de login */
+    .container-login h1 {
+        margin-bottom: 20px;
+    }
+
+    .container-login {
+        background: #ffffff;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        width: 350px;
+        text-align: center;
+        margin-top: 20px; /* Espaço extra abaixo da welcome-section */
+    }
+    
+    /* Inputs e formatação */
+    .container-login input[type="text"],
+    .container-login input[type="password"],
+    .container-login input[type="email"],
+    .container-login select {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 16px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        color: #333333;
+        transition: border-color 0.3s, box-shadow 0.3s ease;
+    }
+    
+    .container-login input[type="text"]:focus,
+    .container-login input[type="password"]:focus,
+    .container-login input[type="email"]:focus,
+    .container-login select:focus {
+        border-color: #80bdff; /* Cor de borda em foco */
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Sombra em foco */
+        outline: none;
+    }
+    
+    /* Estilo do input de senha */
+    .container-login input[type="password"] {
+        text-align: center;
+    }
+    
+    /* Botões */
+    .container-login input[type="submit"],
+    .container-login button {
+        width: 49%;
+        padding: 10px;
+        background-color: #007bff;
+        border: none;
+        border-radius: 15px;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    
+    .container-login input[type="submit"]:hover,
+    .container-login button:hover {
+        background-color: #0056b3;
+    }
+    
+    /* Links */
+    .container-login a {
+        margin-top: 20px; /* Espaço acima do link */
+        margin-bottom: 20px;
+        color: #007bff; /* Cor do texto */
+        text-decoration: none; /* Remove sublinhado */
+        display: inline-block; /* Permite usar margens laterais para centralização */
+        text-align: center; /* Centraliza o texto */
+        width: 100%; /* Faz o link ocupar toda a largura do contêiner */
+}
+
+    
+    .container-login a:hover {
+        text-decoration: underline;
+    }
+
+ /* Registro */
+.container-register {
+        background: #ffffff;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        width: 350px;
+        text-align: center;
+    }
+
+.container-register label {
+    font-size: 16px; /* Tamanho da fonte */
+    color: #333333; /* Cor do texto */
+    margin-bottom: 8px; /* Espaço abaixo do label */
+    display: block; /* Faz o label ocupar toda a largura disponível */
+}
+.container-register h1 {
+    margin-bottom: 20px;
+}
+.container-register a {
+    margin-top: 20px; /* Espaço acima do link */
+    color: #007bff; /* Cor do texto */
+    text-decoration: none; /* Remove sublinhado */
+    display: inline-block; /* Permite usar margens laterais para centralização */
+    text-align: center; /* Centraliza o texto */
+    width: 100%; /* Faz o link ocupar toda a largura do contêiner */
+}
+/* Estilo para inputs */
+.container-register input[type="text"],
+.container-register input[type="password"],
+.container-register input[type="email"] {
+    width: 100%; /* Largura total do input */
+    padding: 10px; /* Preenchimento interno */
+    margin-bottom: 10px; /* Espaço abaixo do input */
+    border: 1px solid #ced4da; /* Cor da borda */
+    border-radius: 4px; /* Bordas arredondadas */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Efeito de transição */
+}
+
+/* Efeito de foco para inputs */
+.container-register input[type="text"]:focus,
+.container-register input[type="password"]:focus,
+.container-register input[type="email"]:focus {
+    border-color: #80bdff; /* Cor da borda em foco */
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Sombra em foco */
+}
+
+    /* Container de recuperação de senha */
+    .container-recovery {
+        background: #ffffff;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+        width: 350px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .container-recovery h1 {
+        margin-bottom: 20px;
+    }
+    
+    /* Container de selects */
+    .select-container {
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    /* Media Queries para responsividade */
+    @media (max-width: 400px) {
+        .container-login, .container-recovery {
+            width: 100%;
+            padding: 16px;
+        }
+    
+        .upper-bar button {
+            font-size: 14px; /* Reduz o tamanho da fonte em telas pequenas */
+        }
+    }
+    
+    /* Estilos específicos para a página de estoque */
+    .storage-page {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .storage-page .welcome-section {
+        margin-top: 80px; /* Espaço para a barra superior */
+    }
+    
+    .storage-page #formContainer {
+        display: none;
+    }
+    
+    .storage-page .form {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+        width: 350px;
+        text-align: left; /* Texto alinhado à esquerda */
+    }
+    
+    /* Formulários de produtos */
+    .storage-page .form input[type="text"] {
+        width: calc(100% - 16px); /* Corrige a largura dos inputs */
+        margin-bottom: 16px; /* Espaço abaixo dos inputs */
+    }
+    
+    /* Estilo dos botões de formulário */
+    .storage-page .form input[type="submit"] {
+        background-color: #007bff;
+    }
+    
+    .storage-page .form input[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+    
     background-color: #e9ecef; /* Cor de fundo suave */
     display: flex;
     flex-direction: column; /* Organiza conteúdo em coluna */
     align-items: center; /* Centraliza horizontalmente */
     height: 100vh; /* Ocupa toda a altura da viewport */
+    margin: 0;
 }
 
-/* Barra Superior Fixa */
+/* Barra superior fixa no topo */
 .upper-bar {
     width: 100%; /* Largura total da tela */
     display: flex;
@@ -25,10 +309,11 @@ body {
     background-color: #6f42c1; /* Cor de fundo */
     position: fixed; /* Fixa a barra no topo */
     top: 0; /* Posição no topo */
-    z-index: 1000; /* Acima de outros elementos */
+    left: 0;
+    z-index: 1000; /* Certifica-se de que está acima de outros elementos */
 }
 
-/* Botões da Barra Superior */
+/* Estilo para botões na barra superior */
 .upper-bar button {
     background-color: #ffffff; /* Cor de fundo */
     color: #6f42c1; /* Cor do texto */
@@ -42,7 +327,7 @@ body {
 }
 
 .upper-bar button:hover {
-    background-color: #5a32a3; /* Cor ao passar o mouse */
+    background-color: #5a32a3; /* Cor de fundo ao passar o mouse */
 }
 
 .upper-bar button:focus {
@@ -50,23 +335,21 @@ body {
     box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.5); /* Sombra ao focar */
 }
 
-/* Seção de Boas-Vindas */
+/* Seção de boas-vindas abaixo da barra superior */
 .welcome-section {
     text-align: center; /* Centraliza o texto */
-    margin-top: 80px; /* Espaço para compensar a barra fixa */
+    margin-top: 80px; /* Adiciona espaço para compensar a barra fixa */
     margin-bottom: 24px;
 }
 
 .welcome-section h1 {
     margin: 12px 0;
-    color: #333; /* Cor do texto */
 }
 
 .welcome-section button {
     background-color: #dc3545;
     color: white;
     border: none;
-    width: 25%;
     border-radius: 4px;
     padding: 12px 16px;
     cursor: pointer;
@@ -83,127 +366,101 @@ body {
     box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.5);
 }
 
-/* Container Principal */
-.container-products {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* Container principal */
+.container {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 350px;
+    text-align: center;
     margin-top: 20px; /* Espaço extra abaixo da welcome-section */
 }
 
-/* quadrado branco em formulario */
-.form {
-    background: #ffffff;
-    padding: 20px;
-    width: 100%; /* Largura total */
-    max-width: 500px; /* Limite de largura */
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-    text-align: left; /* Texto alinhado à esquerda */
-}
-
-.form h2 {
-    margin-bottom: 20px;
-    color: #007bff; /* Cor do título */
-}
-
-.form label {
-    display: block;
-    margin: 10px 0 5px;
-    color: #333; /* Cor do texto */
-}
-
-/* Estilos para Inputs */
+/* Inputs e formatação */
 input[type="text"],
-input[type="number"],
+input[type="password"],
 input[type="email"],
 select {
-    width: calc(80% - 16px); /* Corrige a largura dos inputs */
-    padding: 10px;
-    margin-bottom: 16px; /* Espaço abaixo dos inputs */
-    border: 1px solid #ced4da; /* Cor da borda */
-    border-radius: 4px; /* Bordas arredondadas */
-    transition: border-color 0.3s, box-shadow 0.3s ease; /* Efeito de transição */
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 16px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    color: #333333;
+    transition: border-color 0.3s, box-shadow 0.3s ease;
 }
 
 input[type="text"]:focus,
-input[type="number"]:focus,
+input[type="password"]:focus,
 input[type="email"]:focus,
 select:focus {
-    border-color: #80bdff; /* Cor da borda em foco */
+    border-color: #80bdff; /* Cor de borda em foco */
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Sombra em foco */
     outline: none;
 }
 
-/* Estilos para Botões */
+/* Estilo do input de senha */
+input[type="password"] {
+    text-align: center;
+}
+
+/* Botões */
 input[type="submit"],
 button {
-    width: 40%;
+    width: 100%;
     padding: 10px;
-    background-color: #007bff; /* Cor de fundo */
-    border: none; /* Sem borda */
-    border-radius: 4px; /* Bordas arredondadas */
-    color: white; /* Cor do texto */
-    font-size: 16px; /* Tamanho da fonte */
-    cursor: pointer; /* Cursor em forma de mão */
-    transition: background-color 0.3s ease; /* Transição suave */
+    background-color: #007bff;
+    border: none;
+    border-radius: 15px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 input[type="submit"]:hover,
 button:hover {
-    background-color: #0056b3; /* Cor ao passar o mouse */
+    background-color: #0056b3;
 }
 
 /* Links */
 a {
     margin-top: 20px;
-    color: #007bff; /* Cor do texto */
-    text-decoration: none; /* Remove sublinhado */
+    color: #007bff;
+    text-decoration: none;
 }
 
 a:hover {
-    text-decoration: underline; /* Sublinha ao passar o mouse */
+    text-decoration: underline;
 }
 
-/* Container de Visualização de Produtos */
-#viewProducts {
-    margin-top: 20px;
-    background: #ffffff; /* Cor de fundo do painel de produtos */
-    padding: 20px;
+/* Container de recuperação de senha */
+.container-recovery {
+    background: #ffffff;
+    padding: 24px;
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    width: 100%; /* Largura total */
-    max-width: 500px; /* Limite de largura */
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
-/* Estilo para cada produto na lista */
-#productList {
-    margin-top: 10px; /* Espaço acima da lista */
+input[type="text"] {
+    text-align: center;
 }
 
-#productList div {
-    padding: 10px;
-    border-bottom: 1px solid #ced4da; /* Linha de separação */
+/* Container de selects */
+.select-container {
+    display: flex;
+    justify-content: space-between;
 }
 
-#productList div:last-child {
-    border-bottom: none; /* Remove a linha do último produto */
-}
-
-/* Responsividade */
-@media (max-width: 600px) {
-    .upper-bar button {
-        font-size: 14px; /* Reduz o tamanho da fonte em telas pequenas */
-    }
-
-    .container-products .form {
-        width: 100%; /* Largura responsiva */
-    }
-}
-
+/* Media Queries para responsividade */
 @media (max-width: 400px) {
-    .container-products .form {
+    .container, .container-recovery {
         width: 100%;
         padding: 16px;
     }
@@ -212,6 +469,7 @@ a:hover {
         font-size: 14px; /* Reduz o tamanho da fonte em telas pequenas */
     }
 }
+
 /* Estilos para o Formulário de Adição de Produto */
 #addProductForm {
     background: #ffffff; /* Cor de fundo do formulário */

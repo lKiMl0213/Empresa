@@ -1,0 +1,66 @@
+/* Estilo geral para a página de recuperação de senha */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Contêiner principal da página de recuperação */
+.container-recovery {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 50px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.container-recovery h1 {
+    font-size: 40px;
+    margin-bottom: 30px;
+    margin-top: 10px;
+}
+
+/* Estilos para o campo de input de login/email */
+.container-recovery input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    text-align: center;
+    border: 1px solid #ced4da;
+    box-sizing: border-box;
+}
+
+/* Estilo para o botão de recuperação de senha */
+.container-recovery input[type="submit"] {
+    width: 50%;
+    padding: 12px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.container-recovery input[type="submit"]:hover {
+    background-color: #218838;
+}
+
+/* Link para voltar à página principal */
+.container-recovery a {
+    display: block;
+    margin-top: 20px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.container-recovery a:hover {
+    text-decoration: underline;
+}
