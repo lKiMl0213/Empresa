@@ -1,230 +1,193 @@
-import openpyxl
+from flask import Blueprint, render_template, request, jsonify
+from flask_mysqldb import MySQL
 from datetime import datetime, timedelta
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
-from flask_cors import CORS
 
+estoque_bp = Blueprint('estoque', __name__)
 
-app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+mysql = MySQL()
 
-def get_positive_float_input(message):
-    while True:
-        try:
-            value = float(input(message).replace(",", "."))
-            if value < 0:
-                raise ValueError
-            return value
-        except ValueError:
-            print("Erro: Insira um número positivo válido.")
+def register_product(barcode, name, buy_price, sell_price, stock, expiration_date):
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM products WHERE barcode = %s OR name = %s", (barcode, name))
+    existing_product = cursor.fetchone()
+    cursor.close()
 
-def get_positive_int_input(message):
-    while True:
-        try:
-            value = int(input(message))
-            if value < 0:
-                raise ValueError
-            return value
-        except ValueError:
-            print("Erro: Insira um número inteiro positivo válido.")
-
-def get_valid_date_input(message):
-    while True:
-        expiration_date = input(message).replace("-", "/")
-        if len(expiration_date) == 5 and expiration_date[2] == '/':
-            try:
-                month, year = map(int, expiration_date.split('/'))
-                if 1 <= month <= 12:
-                    return expiration_date
-                else:
-                    print("Erro: Mês inválido. O mês deve estar entre 01 e 12.")
-            except ValueError:
-                print("Erro: Formato de data inválido. Use mm/aa ou mm-aa.")
-        else:
-            print("Erro: Formato de data inválido. Use mm/aa ou mm-aa.")
-
+    if existing_product:
+        if existing_product[1] == barcode:
+            return "Código de barras já em uso!"
+        elif existing_product[2] == name:
+            return "Nome do produto já em uso!"
+    
+    cursor.execute("INSERT INTO products(barcode, name, buy_price, sell_price, stock, expiration_date) VALUES (%s, %s, %s, %s, %s, %s)", 
+                   (barcode, name, buy_price, sell_price, stock, expiration_date))
+    mysql.connection.commit()
+    cursor.close()
+    return "Produto cadastrado com sucesso"
+    
 def add_storage():
-    barcode = input("Digite o código de barras do produto: ")
-    workbook = openpyxl.load_workbook("storage.xlsx")
-    sheet = workbook.active
-    product_found = False
+    if request.method == 'POST':
+        barcode = request.form.get('barcode')
+        name = request.form.get('name')
+        buy_price = request.form.get('buy_price')
+        sell_price = request.form.get('sell_price')
+        stock = request.form.get('stock')
+        month = request.form.get('month')
+        year = request.form.get('year')
     
-    for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=1, max_col=1):
-        if row[0].value == barcode:
-            product_found = True
-            update = input(f"Produto já cadastrado! Deseja atualizar o produto? (S/N): ").upper()
-            if update == "S":
-                print("O que deseja atualizar?")
-                print("1. Nome")
-                print("2. Preço de compra")
-                print("3. Preço de venda")
-                print("4. Estoque")
-                print("5. Data de validade")
-                print("6. Voltar ao menu principal")
-                choice = input("Escolha uma opção: ")
-                for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row):
-                    if row[0].value == barcode:
-                        if choice == "1":
-                            name = input("Digite o novo nome do produto: ")
-                            row[1].value = name
-                        elif choice == "2":
-                            buy_price = get_positive_float_input("Digite o novo preço de compra do produto: ")
-                            row[2].value = buy_price
-                        elif choice == "3":
-                            sell_price = get_positive_float_input("Digite o preço de venda do produto: ")
-                            row[3].value = sell_price
-                        elif choice == "4":
-                            stock = get_positive_int_input("Digite a quantidade que deseja adicionar ao estoque do produto: ")
-                            old_stock = row[4].value
-                            row[4].value = old_stock + stock
-                            print(f"Estoque atualizado com sucesso! Estoque: {row[4].value}")
-                        elif choice == "5":
-                            expiration_date = get_valid_date_input("Digite a nova data de validade do produto (mm/aa)(mm-aa): ")
-                            row[5].value = expiration_date
-                        elif choice == "6":
-                            print("Voltando ao menu principal...")
-                            workbook.close()
-                            return
-                        else:
-                            print("Opção inválida!")
-                        break
-                save_storage(workbook)
-            elif update == "N":
-                print("Voltando ao menu principal...")
-                workbook.close()
-                return
+        expiration_date = f"{year}-{str(month).zfill(2)}"
+
+        if not all([barcode, name, buy_price, sell_price, stock, expiration_date]):
+            return jsonify(success=False, message="Todos os campos são obrigatórios.")
+    
+        try:
+            message = register_product(barcode, name, buy_price, sell_price, stock, expiration_date)
+            if message == "Produto cadastrado com sucesso":
+                return jsonify(success=True)
             else:
-                print("Opção inválida!")
-                workbook.close()
-                return
-    
-    if not product_found:
-        name = input("Digite o nome do produto: ")
-        buy_price = get_positive_float_input("Digite o preço de compra do produto: ")
-        sell_price = get_positive_float_input("Digite o preço de venda do produto: ")
-        stock = get_positive_int_input("Digite a quantidade em estoque do produto: ")
-        expiration_date = get_valid_date_input("Digite a data de validade do produto (mm/aa)(mm-aa): ")
-        new_row = [barcode, name, buy_price, sell_price, stock, expiration_date]
-        sheet.append(new_row)
-        save_storage(workbook)
-    
-def save_storage(workbook):
-    workbook.save("storage.xlsx")
-    workbook.close()
-    print("Produto atualizado/cadastrado com sucesso!")
-    
+                return jsonify(success=False, message=message)
+        except Exception as e:
+            return jsonify(success=False, message=f"Ocorreu um erro: {str(e)}")
+    return render_template('storage.html', datetime=datetime)
+
 
 def remove_storage():
-    barcode = input("Digite o código do produto: ")
-    workbook = openpyxl.load_workbook("storage.xlsx")
-    sheet = workbook.active
-    product_found = False
+    barcode_or_name = request.form.get('productId')
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM storage WHERE barcode = %s OR name = %s", (barcode_or_name, barcode_or_name))
+    product = cursor.fetchone()
+    cursor.close()
 
-    for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=1, max_col=1):
-        if row[0].value == barcode:
-            sheet.delete_rows(row[0].row)
-            save_storage(workbook)
-            print("Produto removido com sucesso!")
-            product_found = True
-            break
-
-    if not product_found:
-        print("Produto não encontrado!")
-        workbook.close()
+    if product:
+        try:
+            cursor = mysql.connection.cursor()
+            cursor.execute("DELETE FROM storage WHERE barcode = %s OR name = %s", (barcode_or_name, barcode_or_name))
+            mysql.connection.commit()
+            return jsonify(success=True)
+        except Exception as e:
+            return jsonify(success=False, error=str(e))
+        finally:
+            cursor.close()
+    
 
 def low_stock():
-    workbook = openpyxl.load_workbook("storage.xlsx")
-    sheet = workbook.active
-    low_stock_products = []
-
-    for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=1, max_col=5):
-        stock_quantity = row[4].value
-        product_name = row[1].value
-
-        if stock_quantity < 5:
-            low_stock_products.append((product_name, stock_quantity))
-
-    if low_stock_products:
-        print("Produtos com estoque baixo:")
-        for product_name, quantity in low_stock_products:
-            print(f"{product_name} - Estoque: {quantity}")
-    else:
-        print("Não há produtos com estoque baixo.")
-    workbook.close()
+    try: 
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT * FROM storage")
+        products = cursor.fetchall()
+        low_stock_products = []
+        for product in products:
+            if product[5] < 5:
+                low_stock_products.append((product[2], product[4]))
+        if low_stock_products:
+            return jsonify(success=True, message="Os produtos com estoque baixo são: " + low_stock_products)
+        else:
+            return jsonify(success=False, message="Não há produtos com estoque baixo.")
+    except Exception as e:
+        return jsonify(success=False, message=f"Ocorreu um erro: {str(e)}")
+    finally:
+        cursor.close()
     
-def storage_verify():
-    try:
-        openpyxl.load_workbook("storage.xlsx")
-    except FileNotFoundError:
-        workbook = openpyxl.Workbook()
-        sheet = workbook.active
-        sheet.append(["Código", "Nome", "Preço de Compra", "Preço de Venda", "Estoque", "Data de Validade"])
-        save_storage(workbook)
-
 def expiration_date_verify():
     try:
-        workbook = openpyxl.load_workbook("storage.xlsx")
-        sheet = workbook.active
-        produtos_proximos_vencer = []
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT * FROM storage")
+        products = cursor.fetchall()
+        closed_to_expire = []
 
-        for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row):
-            expiration_date = row[5].value
+        for product in products:
+            expiration_date = product[6]
             if expiration_date:
                 try:
-                    expiration_date = datetime.strptime(expiration_date, "%m/%y")
+                    expiration_date = datetime.strptime(expiration_date, "%Y-%m")
                     if expiration_date <= datetime.now() + timedelta(days=30):
-                        produtos_proximos_vencer.append(row[1].value)
+                        closed_to_expire.append(product[2])
                 except ValueError:
-                    print(f"Erro ao analisar a data de validade do produto: {row[1].value}")
+                    print(f"Erro ao analisar a data de validade do produto: {product[2]}")
 
-        if produtos_proximos_vencer:
-            print("Produto(s) próximo(s) de vencer:")
-            for produto in produtos_proximos_vencer:
-                print(produto)
-        else:
-            print("Não há produtos próximos de vencer.")
-
-    except FileNotFoundError:
-        print("Não há produtos cadastrados!")
+        if closed_to_expire:
+            return jsonify(success=True, message="Os produtos próximos de vencer são: " + closed_to_expire)
     except Exception as e:
-        print(f"Erro ao verificar produtos próximos de vencer: {e}")
-    workbook.close()
+        return jsonify(success=False, message=f"Ocorreu um erro: {str(e)}")
+    finally:
+        cursor.close()
 
-def storage_list():
-    try:
-        workbook = openpyxl.load_workbook("storage.xlsx")
-        sheet = workbook.active
+def update_product(barcode, name, buy_price, sell_price, stock, expiration_date):
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM storage WHERE barcode = %s OR name = %s", (barcode, name))
+    existing_product = cursor.fetchone()
 
-        for row in sheet.iter_rows(min_row=2, values_only=True):
-            print(f"Código de Barras: {row[0]}, Nome do Produto: {row[1]}, "
-                  f"Valor de Compra: {row[2]}, Valor de Venda: {row[3]}, "
-                  f"Estoque: {row[4]}, Data de Validade: {row[5]}")
-
-    except FileNotFoundError:
-        print("Não há produtos cadastrados!")
-    workbook.close()
-
-def main():
-    while True:
-        print("1. Adicionar produto")
-        print("2. Remover produto")
-        print("3. Listar produtos cadastrados")
-        print("4. Sair")
-        expiration_date_verify()
-        low_stock()
-        choice = input("Escolha uma opção: ")
-
-        if choice == "1":
-            add_storage()
-            storage_verify()
-        elif choice == "2":
-            remove_storage()
-            storage_verify()
-        elif choice == "3":
-            storage_list()
-        elif choice == "4":
-            break
+    if existing_product:
+        if existing_product[1] == barcode or existing_product[2] == name:
+            try: 
+                cursor.execute("""
+                    update storage
+                    set barcode = %s, name = %s, buy_price = %s, sell_price = %s, stock = %s, expiration_date = %s
+                    where id = %s
+                    """, (barcode, name, buy_price, sell_price, stock, expiration_date, existing_product[0]))
+                mysql.connection.commit()
+                return "Produto atualizado com sucesso"
+            except Exception as e:
+                return f"Ocorreu um erro: {str(e)}"
         else:
-            print("Opção inválida!")
+            return "Produto não encontrado"
+    else:
+        return "Produto não encontrado"
+    cursor.close()
+
+def update_storage():
+    if request.method == 'POST':
+        barcode_or_name = request.form.get('productId')
+        if not barcode_or_name:
+            return jsonify(success=False, message="Nenhum produto selecionado.")
+        try:
+            cursor = mysql.connection.cursor()
+            cursor.execute("SELECT * FROM storage WHERE barcode = %s OR name = %s", (barcode_or_name, barcode_or_name))
+            product = cursor.fetchone()
+            cursor.close()
+            
+            if not product:
+                return jsonify(success=False, message="Produto não encontrado.")
+            
+            if request.form.get('fetch_data'):
+                product_data = {
+                    'barcode': product[1],
+                    'name': product[2],
+                    'buy_price': product[3],
+                    'sell_price': product[4],
+                    'stock': product[5],
+                    'expiration_date': product[6]
+                }
+                return jsonify(success=True, product=product_data)
+            
+            barcode = request.form.get('barcode')
+            name = request.form.get('name')
+            buy_price = request.form.get('buy_price')
+            sell_price = request.form.get('sell_price')
+            stock = request.form.get('stock')
+            month = request.form.get('month')
+            year = request.form.get('year')
+            expiration_date = f"{year}-{str(month).zfill(2)}" if year and month else None
+
+            if not all([barcode, name, buy_price, sell_price, stock, expiration_date]):
+                return jsonify(success=False, message="Todos os campos são obrigatórios.")
+            
+            try:
+                message = update_product(barcode, name, buy_price, sell_price, stock, expiration_date)
+                if message == "Produto atualizado com sucesso":
+                    return jsonify(success=True)
+                else:
+                    return jsonify(success=False, message=message)
+            except Exception as e:
+                return jsonify(success=False, message=f"Ocorreu um erro: {str(e)}")
+        except Exception as e:
+            return jsonify(success=False, message=f"Ocorreu um erro ao buscar o produto: {str(e)}")
+    
+    return render_template('storage.html', datetime=datetime)
+
+
+@estoque_bp.route('/storage', methods=['GET', 'POST'])
+def storage():
+    return render_template('storage.html')
 
 if __name__ == "__main__":
     app.run(debug=True)

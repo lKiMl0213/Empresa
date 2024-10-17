@@ -11,15 +11,15 @@
 <body>
     <div class="container-login">
         <h1>Empresa</h1>
-        <form method="post" action="{{ url_for('login') }}" onsubmit="handleSubmit(event);">
+        <form method="post" action="{{ url_for('user_management.login') }}" onsubmit="handleSubmit(event);">
             <input type="text" id="login" name="login" required minlength="5" pattern="[a-zA-Z0-9]+" placeholder="Digite seu nome de usuário">
             <input type="password" id="password" name="password" required minlength="8" placeholder="Digite sua senha">
             <div class="login-buttons">
                 <input type="submit" value="Login">
-                <button type="button" onclick="window.location.href='{{ url_for('register') }}';">Registrar-se</button>
+                <button type="button" onclick="window.location.href='{{ url_for('user_management.register') }}';">Registrar-se</button>
             </div>
         </form>
-        <a href="{{ url_for('recovery') }}">Recuperar senha</a>
+        <a href="{{ url_for('user_management.recovery') }}">Recuperar senha</a>
     </div>
 
     <script>
@@ -47,11 +47,11 @@
                 .then(data => {
                     if (data.success) {
                         if (data.user_type === 'rh') {
-                            window.location.href = '/rh';
+                            window.location.href = '/rh.html';
                         } else if (data.user_type === 'storage') {
-                            window.location.href = '/storage';
+                            window.location.href = '/storage.html';
                         } else {
-                            window.location.href = '/market';
+                            window.location.href = '/market.html';
                         }
                     } else {
                         showMessage("Usuário/senha incorretos");

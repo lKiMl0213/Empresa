@@ -6,6 +6,7 @@ from Estoque import get_positive_int_input
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
+
 def load_workbook_safe(storage_xlsx):
     try:
         return openpyxl.load_workbook(storage_xlsx)
