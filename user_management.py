@@ -7,8 +7,36 @@ user_management_bp = Blueprint('user_management', __name__)
 
 mysql = MySQL()
 
+@user_management_bp.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        login = request.form['login']
+        password = request.form['password']
+
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT * FROM users WHERE login = %s", (login,))
+        user = cursor.fetchone()
+        cursor.close()
+
+        if user:
+            stored_hash = user[2]
+            if scrypt.verify(password, stored_hash):
+                return user_type(user, login)
+            else:
+                return jsonify(success=False, message="Senha inválidos.")
+        else:
+            return jsonify(success=False, message="Usuário não encontrado.")
+
+    return render_template('home.html')
+
+def user_type(user, login):
+    if len(user) < 8:
+        return jsonify(success=False, message="Tipo de usuário não encontrado.")
+    return jsonify(success=True, user_type=user[7], login=login)
+
+
 def register_user(login, hashed_password, name, birthday, cpf, email, user_type):
-    cursor = mysql.connection.cursor('mysql')
+    cursor = mysql.connection.cursor()
     cursor.execute("SELECT * FROM users WHERE login = %s OR email = %s", (login, email))
     existing_user = cursor.fetchone()
 
@@ -53,14 +81,14 @@ def register():
                 return jsonify(success=False, message=message)
         except Exception as e:
             return jsonify(success=False, message=f"Ocorreu um erro: {str(e)}")
-
-    return render_template('register.html', datetime=datetime)
+    current_year = datetime.datetime.now().year
+    return render_template('register.html', datetime=datetime, current_year=current_year)
 
 @user_management_bp.route('/recovery', methods=['GET', 'POST'])
 def recovery():
     if request.method == 'POST':
         login_or_email = request.form['login']
-        cursor = mysql.connection.cursor('mysql')
+        cursor = mysql.connection.cursor()
         cursor.execute("SELECT * FROM users WHERE login = %s OR email = %s", (login_or_email, login_or_email))
         user = cursor.fetchone()
         cursor.close()

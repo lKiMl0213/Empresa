@@ -21,32 +21,21 @@ mysql = MySQL(app)
 app.register_blueprint(user_management_bp, url_prefix='/user_management')
 app.register_blueprint(estoque_bp, url_prefix='/estoque')
 
-@app.route('/', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        login = request.form['login']
-        password = request.form['password']
-
-        cursor = mysql.connection.cursor()
-        cursor.execute("SELECT * FROM users WHERE login = %s", (login,))
-        user = cursor.fetchone()
-        cursor.close()
-
-        if user:
-            stored_hash = user[2]
-            if scrypt.verify(password, stored_hash):
-                return user_type(user, login)
-            else:
-                return jsonify(success=False, message="Senha inválidos.")
-        else:
-            return jsonify(success=False, message="Usuário não encontrado.")
-
+@app.route('/')
+def home():
     return render_template('home.html')
 
-def user_type(user, login):
-    if len(user) < 8:
-        return jsonify(success=False, message="Tipo de usuário não encontrado.")
-    return jsonify(success=True, user_type=user[7], login=login)
+@app.route('/rh')
+def rh():
+    return render_template('rh.html')
+
+@app.route('/storage')
+def storage():
+    return render_template('storage.html')
+
+@app.route('/market')
+def market():
+    return render_template('market.html')
 
 if __name__ == "__main__":
     app.run(debug=True)

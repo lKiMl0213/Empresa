@@ -40,7 +40,7 @@
 <body>
     <div class="container-recovery">
         <h1>Recuperar Senha</h1>
-        <form method="post" action="{{ url_for('recovery') }}" onsubmit="handleSubmit(event)">
+        <form method="post" action="{{ url_for('user_management.recovery') }}" onsubmit="handleSubmit(event)">
             <input type="text" id="login" name="login" required minlength="5" placeholder="Insira seu nome de usuário/email">
 
             <input type="submit" value="Recuperar">

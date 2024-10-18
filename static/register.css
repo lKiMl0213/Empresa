@@ -121,14 +121,15 @@ width: 100%;
 }
 
 /* Contêiner para selects de data de nascimento */
-.select-container {
+.select-container-data {
     display: flex;
     justify-content: space-between;
     margin-bottom: 15px;
+    align-items: center;
 }
 
-.select-container select {
-    width: 32%;
+.select-container-data select {
+    width: 40%;
     padding: 10px;
     border-radius: 30px;
     border: 1px solid #ced4da;

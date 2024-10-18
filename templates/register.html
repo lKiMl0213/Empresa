@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>Registrar Usuário</title>
 </head>
+
 <body>
     <div class="container-register">
         <h1>Registrar Usuário</h1>
-        <form method="post" action="{{ url_for('register') }}" onsubmit="handleSubmit(event);">
+        <form method="post" action="{{ url_for('user_management.register') }}" onsubmit="handleSubmit(event);">
             <label for="login">Nome de Usuário:</label>
             <input type="text" id="login" name="login" required minlength="5" pattern="[a-z0-9]+" placeholder="Digite seu nome de usuário">
 
@@ -23,7 +25,7 @@
             <input type="text" id="cpf" name="cpf" required placeholder="Digite seu CPF">
 
             <label for="birthday">Data de Nascimento:</label>
-            <div class="select-container-data-register">
+            <div class="select-container-data">
                 <select name="day" required>
                     <option value="">Dia</option>
                     {% for day in range(1, 32) %}
@@ -71,23 +73,24 @@
             const formData = new FormData(form);
 
             fetch(form.action, {
-                method: form.method,
-                body: formData,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showMessage("Usuário registrado com sucesso!");
-                    window.location.href = '{{ url_for('home') }}';
-                } else {
-                    showMessage("Erro ao registrar usuário: " + data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
+                    method: form.method,
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showMessage("Usuário registrado com sucesso!");
+                        window.location.href = '{{ url_for('home') }}';
+                    } else {
+                        showMessage("Erro ao registrar usuário: " + data.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         }
     </script>
 </body>
+
 </html>
