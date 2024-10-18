@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR"></html>
 <head>
     <meta charset="UTF-8">
     <title>Estoque</title>
@@ -8,30 +7,29 @@
 </head>
 <body class="storage-page">
     <div class="upper-bar">
-        <button onclick="showForm('addProductForm')">Adicionar Produtos</button>
-        <button onclick="showForm('removeProductForm')">Remover Produtos</button>
-        <button onclick="showForm('updateProductForm')">Atualizar Produtos</button>
-        <button onclick="showForm('viewProducts')">Ver Produtos</button>
+        <button onclick="setupForm()">Gerenciar Estoque</button>
+        <button onclick="showProducts()">Ver Produtos</button>
     </div>
 
     <div class="welcome-section">
         <h1>Bem-vindo {{ user }} ao Estoque</h1> 
         <button onclick="window.location.href='{{ url_for('home') }}';">Sair</button>
     </div>
+   <div id="formContainer" style="display:none;">
+        <h2 id="formTitle">Gerenciar Produtos</h2>
+            <form method="POST" action="{{ url_for('storage') }}" onsubmit="handleSubmit(event)">
+                <label for="productBarcode">Código de Barras do Produto:</label>
+                <input type="text" id="productBarcode" name="productBarcode">
+                <input type="button" value="Verificar" onclick="checkBarcode()">
 
-    <div id="formContainer-products" style="display: none;">
-        <div id="addProductForm" class="form" style="display:none;">
-            <h2>Adicionar Produto</h2>
-            <form id="addProduct" onsubmit="submitForm(event, '/products/add');">
-                <label for="barcode">Código de barras:</label>
-                <input type="text" id="barcode" name="barcode" required>
-                <label for="productName">Nome do Produto:</label>
-                <input type="text" id="productName" name="productName" required>
-                <label for="buyPrice">Preço de compra:</label>
-                <input type="number" id="buyPrice" name="buyPrice" required step="0.01" min="0">
-                <label for="sellPrice">Preço de venda:</label>
-                <input type="number" id="sellPrice" name="sellPrice" required step="0.01" min="0">
-                <label for="productQuantity">Quantidade do Produto:</label>
+                <div id="additionalFields" style="display:none;">
+                    <label for="productName">Nome do Produto:</label>
+                    <input type="text" id="productName" name="productName" required>
+                    <label for="buyPrice">Preço de compra:</label>
+                    <input type="number" id="buyPrice" name="buyPrice" required step="0.01" min="0">
+                    <label for="sellPrice">Preço de venda:</label>
+                    <input type="number" id="sellPrice" name="sellPrice" required step="0.01" min="0">
+                    <label for="productQuantity">Quantidade do Produto:</label>
                 <input type="number" id="productQuantity" name="productQuantity" required step="1" min="0">
                 <label for="expirationDate">Data de validade:</label>
                 <div class="select-container-data" required>
@@ -54,87 +52,100 @@
                         {% endfor %}
                     </select>
                 </div>
-                <input type="submit" value="Adicionar">
+                <input type="submit" value="Salvar">
             </form>
-        </div>
-
-        <div id="removeProductForm" class="form" style="display:none;">
-            <h2>Remover Produto</h2>
-            <form id="removeProduct" onsubmit="submitForm(event, '/products/remove');">
-                <label for="productId">ID do Produto:</label>
-                <input type="text" id="productId" name="productId" required>
-                <input type="submit" value="Remover">
-            </form>
-        </div>
-
-        <div id="updateProductForm" class="form" style="display:none;">
-            <h2>Atualizar Produto</h2>
-            <form id="updateProduct" onsubmit="submitForm(event, '/products/update');">
-                <label for="updateProductId">ID do Produto:</label>
-                <input type="text" id="updateProductId" name="updateProductId" required>
-                <label for="updateProductName">Novo Nome:</label>
-                <input type="text" id="updateProductName" name="updateProductName" required>
-                <input type="submit" value="Atualizar">
-            </form>
-        </div>
-
-        <div id="viewProducts" class="form" style="display:none;">
-            <h2>Produtos</h2>
-            <div id="productList"></div>
-        </div>
     </div>
 
+    <div id="productListContainer" style="display: none;"></div>
+
     <script>
-        function showForm(formId) {
-            // Exibe o contêiner do formulário
-            $('#formContainer-products').show();
-            // Oculta todos os formulários
-            $('.form').hide();
-            // Exibe o formulário selecionado
-            $('#' + formId).show();
+        function setupForm(){
+            $('#formContainer').show();
+            $('#productListContainer').hide();
+            $('#productForm')[0].reset();
+            $('#additionalFields').hide();
         }
+        function checkBarcode(){
+            const barcode = $('#productBarcode').val();
+            if (barcode){
+                $.ajax({
+                    url: '/storage',
+                    type: 'GET',
+                    success: function(product){
+                        if (product.exists){
+                            $('#productName').val(product.name);
+                            $('#buyPrice').val(product.buy_price);
+                            $('#sellPrice').val(product.sell_price);
+                            $('#productQuantity').val(product.stock);
+                            $('#expirationDate').val(product.expiration_date);
+                            $('#additionalFields').show();
+                        } else {
+                            $('#additionalFields').show();
+                        }
+                    },
+                    error: function(){
+                        alert('Erro ao verificar código de barras');
+                    }
+                });
+            }
+        }
+         
+        function handleSubmit(event) {
+            event.preventDefault();
 
-        function submitForm(event, actionUrl) {
-            event.preventDefault(); // Impede o envio normal do formulário
+            const form = event.target;
+            const formData = new FormData(form);
 
-            const formData = $(event.target).serialize(); // Obtém os dados do formulário
-
-            $.ajax({
-                type: 'POST',
-                url: actionUrl,
-                data: formData,
-                success: function(response) {
-                    // Aqui você pode adicionar lógica para manipular a resposta
-                    alert(response.message);
-                    loadProducts(); // Recarrega a lista de produtos
-                },
-                error: function(error) {
-                    alert("Erro ao processar a requisição.");
+            fetch(form.action, {
+                method: form.method,
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
                 }
-            });
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage("Produto salvo com sucesso!");
+                    window.location.href = '{{ url_for('storage') }}';
+                } else {
+                    showMessage("Erro ao salvar produto: " + data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
         }
-
-        function loadProducts() {
+        function showMessage(message){
+            alert(message);
+        }
+    
+        function loadProducts(){
             $.ajax({
-                url: '/products',
+                url: '/storage',
                 type: 'GET',
-                success: function(products) {
-                    let productList = $('#productList');
-                    productList.empty(); // Limpa a lista antes de adicionar
-                    products.forEach(product => {
-                        productList.append('<div>' + product.name + ' (ID: ' + product.id + ')</div>');
-                    });
-                },
-                error: function(error) {
-                    alert("Erro ao carregar produtos.");
-                }
-            });
-        }
-
-        // Carrega a lista de produtos ao iniciar a página
-        $(document).ready(function() {
+                success: function(products){
+                let productList = $('#productListContainer');
+                productList.empty();
+                products.forEach(product => {
+                    productList.append('<div>' + product.name + ' (ID: ' + product.id + ')' + '</div>');
+                });
+                $('#formContainer').hide();
+                $('#productListContainer').show();
+            },
+            error: function(){
+                alert('Erro ao carregar produtos');
+            }
+        });}
+    
+        function showProducts(){
             loadProducts();
+            $('#formContainer').hide();
+            $('#productListContainer').show();
+        }
+        $(document).ready(function(){
+            //showProducts();//
         });
+    
     </script>
 </body>
+
 </html>

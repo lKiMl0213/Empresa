@@ -15,6 +15,7 @@ app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
 app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
 app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
 app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
+app.config['MYSQL_DB_products'] = os.getenv('MYSQL_DB_products')
 
 mysql = MySQL(app)
 
@@ -29,13 +30,13 @@ def home():
 def rh():
     return render_template('rh.html')
 
-@app.route('/storage')
-def storage():
-    return render_template('storage.html')
-
 @app.route('/market')
 def market():
     return render_template('market.html')
+
+@app.route('/storage', methods=['GET', 'POST'])
+def storage():
+    return render_template('storage.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
