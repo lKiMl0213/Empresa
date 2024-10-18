@@ -11,7 +11,7 @@
 <body>
     <div class="container-login">
         <h1>Empresa</h1>
-        <form method="post" action="{{ url_for('user_management.login') }}" onsubmit="handleSubmit(event);">
+        <form method="post" action="{{ url_for('user_management._login') }}" onsubmit="handleSubmit(event);">
             <input type="text" id="login" name="login" required minlength="5" pattern="[a-zA-Z0-9]+" placeholder="Digite seu nome de usuário">
             <input type="password" id="password" name="password" required minlength="8" placeholder="Digite sua senha">
             <div class="login-buttons">
@@ -50,7 +50,7 @@
                             window.location.href = '/rh.html';
                         } else if (data.user_type === 'storage') {
                             window.location.href = '/storage.html';
-                        } else {
+                        } else if (data.user_type === 'market') {
                             window.location.href = '/market.html';
                         }
                     } else {
