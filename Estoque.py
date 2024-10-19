@@ -20,7 +20,7 @@ def manage_product():
         if action == 'check_barcode':
             barcode = request.args.get('barcode')
             cursor = get_cursor()
-            cursor.execute("SELECT * FROM product WHERE barcode = %s", (barcode,))
+            cursor.execute("SELECT * FROM products WHERE barcode = %s", (barcode,))
             product = cursor.fetchone()
             close_cursor(cursor)
             if product:
@@ -36,7 +36,7 @@ def manage_product():
                 return jsonify({'exists': False})
         elif action == 'low_stock':
             cursor = get_cursor()
-            cursor.execute("SELECT * FROM product WHERE stock < 10")
+            cursor.execute("SELECT * FROM products WHERE stock < 10")
             products = cursor.fetchall()
             close_cursor(cursor)
             low_stock_products = []
@@ -49,7 +49,7 @@ def manage_product():
             return jsonify(success=True, products=low_stock_products)
         elif action == 'expiration_date_verify':
             cursor = get_cursor()
-            cursor.execute("SELECT * FROM product WHERE expiration_date < CURDATE() + INTERVAL 2 MONTH")
+            cursor.execute("SELECT * FROM products WHERE expiration_date < CURDATE() + INTERVAL 2 MONTH")
             products = cursor.fetchall()
             close_cursor(cursor)
             closed_to_expire = []
@@ -75,12 +75,12 @@ def manage_product():
             return jsonify(success=False, message="Todos os campos são obrigatórios.")
         
         cursor = get_cursor()
-        cursor.execute("SELECT * FROM product WHERE barcode = %s", (barcode,))
+        cursor.execute("SELECT * FROM products WHERE barcode = %s", (barcode,))
         product = cursor.fetchone()
 
         if product:
             cursor.execute("""
-                update product
+                update products
                 set name = %s,
                 buy_price = %s,
                 sell_price = %s,
@@ -93,7 +93,7 @@ def manage_product():
             return jsonify(success=True, message="Produto atualizado com sucesso.")
         else:
             cursor.execute("""
-                insert into product (barcode, name, buy_price, sell_price, stock, expiration_date)
+                insert into products (barcode, name, buy_price, sell_price, stock, expiration_date)
                 values (%s, %s, %s, %s, %s, %s)
             """, (barcode, name, buy_price, sell_price, stock, expiration_date))
             mysql.connection.commit()
@@ -106,11 +106,11 @@ def manage_product():
             return jsonify(success=False, message="Código de barras é obrigatório.")
             
         cursor = get_cursor()
-        cursor.execute("SELECT * FROM product WHERE barcode = %s", (barcode,))
+        cursor.execute("SELECT * FROM products WHERE barcode = %s", (barcode,))
         product = cursor.fetchone()
 
         if product:
-            cursor.execute("DELETE FROM product WHERE barcode = %s", (barcode,))
+            cursor.execute("DELETE FROM products WHERE barcode = %s", (barcode,))
             mysql.connection.commit()
             close_cursor(cursor)
             return jsonify(success=True, message="Produto removido com sucesso.")
@@ -121,7 +121,7 @@ def manage_product():
         action = request.args.get('action')
         if action == 'list_products':
             cursor = get_cursor()
-            cursor.execute("SELECT * FROM product")
+            cursor.execute("SELECT * FROM products")
             products = cursor.fetchall()
             close_cursor(cursor)
 

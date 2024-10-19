@@ -19,7 +19,6 @@
     <h2 id="formTitle">Gerenciar Produtos</h2>
     <form id="productForm" method="POST" action="{{ url_for('storage') }}" onsubmit="handleSubmit(event)">
         <label for="productBarcode">Código de Barras do Produto:</label>
-        <!-- Adicionando name="barcode" -->
         <input type="text" id="productBarcode" name="barcode">
         <input type="button" value="Verificar" onclick="checkBarcode()">
 
