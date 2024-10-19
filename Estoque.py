@@ -60,63 +60,82 @@ def manage_product():
                     'expiration_date': product[6]
                 })
             return jsonify(success=True, products=closed_to_expire)
-        elif request.method == 'POST':
-            data = request.form
-            barcode = data.get('barcode')
-            name = data.get('name')
-            buy_price = data.get('buy_price')
-            sell_price = data.get('sell_price')
-            stock = data.get('stock')
-            month = data.get('month')
-            year = data.get('year')
-            expiration_date = f"{year}-{str(month).zfill(2)}-01"
+    elif request.method == 'POST':
+        data = request.form
+        barcode = data.get('barcode')
+        name = data.get('name')
+        buy_price = data.get('buy_price')
+        sell_price = data.get('sell_price')
+        stock = data.get('stock')
+        month = data.get('month')
+        year = data.get('year')
+        expiration_date = f"{year}-{str(month).zfill(2)}-01"
 
-            if not all([barcode, name, buy_price, sell_price, stock, month, year]):
-                return jsonify(success=False, message="Todos os campos são obrigatórios.")
-            
-            cursor = get_cursor()
-            cursor.execute("SELECT * FROM product WHERE barcode = %s", (barcode,))
-            product = cursor.fetchone()
+        if not all([barcode, name, buy_price, sell_price, stock, month, year]):
+            return jsonify(success=False, message="Todos os campos são obrigatórios.")
+        
+        cursor = get_cursor()
+        cursor.execute("SELECT * FROM product WHERE barcode = %s", (barcode,))
+        product = cursor.fetchone()
 
-            if product:
-                cursor.execute("""
-                    update product
-                    set name = %s,
-                        buy_price = %s,
-                        sell_price = %s,
-                        stock = %s,
-                        expiration_date = %s
-                    where barcode = %s
+        if product:
+            cursor.execute("""
+                update product
+                set name = %s,
+                buy_price = %s,
+                sell_price = %s,
+                stock = %s,
+                expiration_date = %s
+                where barcode = %s
                 """, (name, buy_price, sell_price, stock, expiration_date, barcode))
-                mysql.connection.commit()
-                close_cursor(cursor)
-                return jsonify(success=True, message="Produto atualizado com sucesso.")
-            else:
-                cursor.execute("""
-                    insert into product (barcode, name, buy_price, sell_price, stock, expiration_date)
-                    values (%s, %s, %s, %s, %s, %s)
-                """, (barcode, name, buy_price, sell_price, stock, expiration_date))
-                mysql.connection.commit()
-                close_cursor(cursor)
-                return jsonify(success=True, message="Produto cadastrado com sucesso.")
-        elif request.method == 'DELETE':
-            barcode = request.args.get('barcode')
+            mysql.connection.commit()
+            close_cursor(cursor)
+            return jsonify(success=True, message="Produto atualizado com sucesso.")
+        else:
+            cursor.execute("""
+                insert into product (barcode, name, buy_price, sell_price, stock, expiration_date)
+                values (%s, %s, %s, %s, %s, %s)
+            """, (barcode, name, buy_price, sell_price, stock, expiration_date))
+            mysql.connection.commit()
+            close_cursor(cursor)
+            return jsonify(success=True, message="Produto cadastrado com sucesso.")
+    elif request.method == 'DELETE':
+        barcode = request.args.get('barcode')
 
-            if not barcode:
-                return jsonify(success=False, message="Código de barras é obrigatório.")
+        if not barcode:
+            return jsonify(success=False, message="Código de barras é obrigatório.")
             
-            cursor = get_cursor()
-            cursor.execute("SELECT * FROM product WHERE barcode = %s", (barcode,))
-            product = cursor.fetchone()
+        cursor = get_cursor()
+        cursor.execute("SELECT * FROM product WHERE barcode = %s", (barcode,))
+        product = cursor.fetchone()
 
-            if product:
-                cursor.execute("DELETE FROM product WHERE barcode = %s", (barcode,))
-                mysql.connection.commit()
-                close_cursor(cursor)
-                return jsonify(success=True, message="Produto removido com sucesso.")
-            else:
-                close_cursor(cursor)
-                return jsonify(success=False, message="Produto não encontrado.")
+        if product:
+            cursor.execute("DELETE FROM product WHERE barcode = %s", (barcode,))
+            mysql.connection.commit()
+            close_cursor(cursor)
+            return jsonify(success=True, message="Produto removido com sucesso.")
+        else:
+            close_cursor(cursor)
+            return jsonify(success=False, message="Produto não encontrado.")
+    elif request.method == 'GET':
+        action = request.args.get('action')
+        if action == 'list_products':
+            cursor = get_cursor()
+            cursor.execute("SELECT * FROM product")
+            products = cursor.fetchall()
+            close_cursor(cursor)
+
+            product_list = []
+            for product in products:
+                product_list.append({
+                    'barcode': product[1],
+                    'name': product[2],
+                    'buy_price': product[3],
+                    'sell_price': product[4],
+                    'stock': product[5],
+                    'expiration_date': product[6]
+                })
+            return jsonify(success=True, products=product_list)
     return render_template('storage.html')
 
 if __name__ == '__main__':
