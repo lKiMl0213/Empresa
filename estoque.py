@@ -13,10 +13,12 @@ def get_cursor():
 def close_cursor(cursor):
     cursor.close()
 
-@estoque_bp.route('/storage', methods=['GET', 'POST', 'DELETE'])
+@estoque_bp.route('/', methods=['GET', 'POST', 'DELETE'])
 def manage_product():
     if request.method == 'GET':
         action = request.args.get('action')
+        if not action:
+            return render_template('storage.html')
         if action == 'check_barcode':
             barcode = request.args.get('barcode')
             cursor = get_cursor()
@@ -34,7 +36,7 @@ def manage_product():
                 })
             else:
                 return jsonify({'exists': False})
-        elif action == 'low_stock':
+        if action == 'low_stock':
             cursor = get_cursor()
             cursor.execute("SELECT * FROM products WHERE stock < 10")
             products = cursor.fetchall()
@@ -47,7 +49,7 @@ def manage_product():
                     'stock': product[5]
                     })
             return jsonify(success=True, products=low_stock_products)
-        elif action == 'expiration_date_verify':
+        if action == 'expiration_date_verify':
             cursor = get_cursor()
             cursor.execute("SELECT * FROM products WHERE expiration_date < CURDATE() + INTERVAL 2 MONTH")
             products = cursor.fetchall()
@@ -60,6 +62,23 @@ def manage_product():
                     'expiration_date': product[6]
                 })
             return jsonify(success=True, products=closed_to_expire)
+        if action == 'list_products':
+            cursor = get_cursor()
+            cursor.execute("SELECT * FROM products")
+            products = cursor.fetchall()
+            close_cursor(cursor)
+
+            product_list = []
+            for product in products:
+                product_list.append({
+                    'barcode': product[1],
+                    'name': product[2],
+                    'buy_price': product[3],
+                    'sell_price': product[4],
+                    'stock': product[5],
+                    'expiration_date': product[6].strftime('%m/%Y')
+                })
+            return jsonify(success=True, products=product_list)
     elif request.method == 'POST':
         data = request.form
         barcode = data.get('barcode')
@@ -117,28 +136,7 @@ def manage_product():
         else:
             close_cursor(cursor)
             return jsonify(success=False, message="Produto não encontrado.")
-    elif request.method == 'GET':
-        action = request.args.get('action')
-        if action == 'list_products':
-            cursor = get_cursor()
-            cursor.execute("SELECT * FROM products")
-            products = cursor.fetchall()
-            close_cursor(cursor)
+        
 
-            product_list = []
-            for product in products:
-                product_list.append({
-                    'barcode': product[1],
-                    'name': product[2],
-                    'buy_price': product[3],
-                    'sell_price': product[4],
-                    'stock': product[5],
-                    'expiration_date': product[6]
-                })
-            return jsonify(success=True, products=product_list)
-    return render_template('storage.html')
-
-if __name__ == '__main__':
-    app.run(debug=True)
 
                     

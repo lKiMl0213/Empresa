@@ -19,7 +19,7 @@ app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
 mysql = MySQL(app)
 
 app.register_blueprint(user_management_bp, url_prefix='/user_management')
-app.register_blueprint(estoque_bp, url_prefix='/estoque')
+app.register_blueprint(estoque_bp, url_prefix='/storage')
 
 @app.route('/')
 def home():
@@ -33,9 +33,9 @@ def rh():
 def market():
     return render_template('market.html')
 
-@app.route('/storage', methods=['GET', 'POST'])
-def storage():
-    return render_template('storage.html')
+# @app.route('/storage', methods=['GET'])
+# def storage():
+#     return render_template('storage.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
