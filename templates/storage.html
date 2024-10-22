@@ -23,12 +23,14 @@
         <h2 id="formTitle">Gerenciar Produtos</h2>
         <form id="productForm" method="POST" action="{{ url_for('estoque.manage_product') }}"
             onsubmit="handleSubmit(event)">
-            <label for="productBarcode">Código de Barras do Produto:</label>
-            <input type="text" id="productBarcode" name="barcode">
-            <input type="button" value="Verificar" onclick="checkBarcode()">
+            <label for="productBarcode">Código de Barras:</label>
+            <div class="input-container">
+                <input type="text" id="productBarcode" name="barcode">
+                <input type="button" value="Verificar" onclick="checkBarcode(); document.getElementById('formTitle').style.display='none';">
+            </div>
 
             <div id="additionalFields" style="display:none;">
-                <label for="productName">Nome do Produto:</label>
+                <label for="productName">Nome:</label>
                 <input type="text" id="productName" name="name" required>
 
                 <label for="buyPrice">Preço de compra:</label>
@@ -37,29 +39,45 @@
                 <label for="sellPrice">Preço de venda:</label>
                 <input type="number" id="sellPrice" name="sell_price" required step="0.01" min="0">
 
-                <label for="productQuantity">Quantidade do Produto:</label>
+                <label for="productQuantity">Quantidade:</label>
                 <input type="number" id="productQuantity" name="stock" required step="1" min="0">
 
                 <label for="expirationDate">Data de validade:</label>
                 <div class="select-container-data" required>
                     <select name="month" required>
                         <option value="">Mês</option>
-                        {% set months = { 1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril", 5: "Maio", 6: "Junho",
-                        7: "Julho", 8: "Agosto", 9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro" } %}
+                        {% set months = {
+                            1: "Janeiro",
+                            2: "Fevereiro", 
+                            3: "Março", 
+                            4: "Abril", 
+                            5: "Maio", 
+                            6: "Junho",
+                            7: "Julho", 
+                            8: "Agosto", 
+                            9: "Setembro", 
+                            10: "Outubro", 
+                            11: "Novembro", 
+                            12: "Dezembro" } %}
                         {% for month in range(1, 13) %}
-                        <option value="{{ " %02d"|format(month) }}">{{ months[month] }}</option>
+                            <option value="{{ " %02d"|format(month) }}">{{ months[month] }}</option>
                         {% endfor %}
                     </select>
 
                     <select name="year" required>
                         <option value="">Ano</option>
-                        {% for year in range(2022, 2032) %}
+                        {% for year in range(2024, 2040) %}
                         <option value="{{ year }}">{{ year }}</option>
                         {% endfor %}
                     </select>
                 </div>
-
-                <input type="submit" value="Salvar">
+            </div>
+            <div id="buttonsContainer" style="display:none;">
+                <input type="button" value="Salvar" onclick="addProduct()">
+            
+                <div id="removeProductButton" style="display:none;">
+                    <input type="button" value="Remover" onclick="removeProduct()">
+                </div>
             </div>
         </form>
     </div>
@@ -74,59 +92,100 @@
         }
         function checkBarcode() {
             const barcode = $('#productBarcode').val();
+            $('#additionalFields').find('input, select').val('');
             if (barcode) {
                 $.ajax({
-                    url: '/storage/manage?action=check_barcode&barcode=' + barcode,
+                    url: '{{ url_for('estoque.manage_product') }}?action=check_barcode',
                     type: 'GET',
+                    data: { barcode: barcode },
                     success: function (product) {
                         if (product.exists) {
                             $('#productName').val(product.name);
                             $('#buyPrice').val(product.buy_price);
                             $('#sellPrice').val(product.sell_price);
                             $('#productQuantity').val(product.stock);
-                            $('#expirationDate').val(new Date(product.expiration_date).toISOString().split('T')[0]);
+
+                            const monthMap = {
+                                "01": "Janeiro",
+                                "02": "Fevereiro",
+                                "03": "Março",
+                                "04": "Abril",
+                                "05": "Maio",
+                                "06": "Junho",
+                                "07": "Julho",
+                                "08": "Agosto",
+                                "09": "Setembro",
+                                "10": "Outubro",
+                                "11": "Novembro",
+                                "12": "Dezembro"
+                            };
+                            const monthName = monthMap[product.month];
+                            $('select[name="month"] option').each(function() {
+                                if ($(this).text() === monthName) {
+                                    $(this).prop('selected', true);
+                                }
+                            });
+                            $('select[name="year"]').val(product.year);
                             $('#additionalFields').show();
+                            $('#buttonsContainer').show();
+                            $('#removeProductButton').show();
                         } else {
                             $('#additionalFields').show();
+                            $('#buttonsContainer').show();
+                            $('#removeProductButton').hide();
                         }
                     },
                     error: function () {
-                        alert('Erro ao verificar código de barras');
+                        showMessage('Erro ao verificar código de barras');
                     }
                 });
             }
         }
 
-        function handleSubmit(event) {
-            event.preventDefault();
-
-            const form = event.target;
-            const formData = new FormData(form);
-
-            fetch(form.action, {
-                method: form.method,
-                body: formData,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showMessage("Produto salvo com sucesso!");
-                        $('#productForm')[0].reset();
-                        $('#additionalFields').hide();
-                        window.location.href = '{{ url_for('estoque.manage_product') }}';
-                    } else {
-                        showMessage("Erro ao salvar produto: " + data.message);
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-        }
         function showMessage(message) {
             alert(message);
         }
 
+        function addProduct() {
+            const form = $('#productForm');
+            const formData = new FormData(form[0]);
+            $.ajax({
+                url: '{{ url_for('estoque.manage_product') }}?action=add_product',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    showMessage(data.message);
+                    form[0].reset();
+                    $('#additionalFields').hide();
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                },
+                error: function () {
+                    showMessage(data.message);
+                }
+            });
+        }
+
+        function removeProduct() {
+            const barcode = $('#productBarcode').val();
+            $.ajax({
+                url: '{{ url_for('estoque.manage_product') }}?action=remove_product',
+                type: 'POST',
+                data: { barcode: barcode },
+                success: function (data) {
+                    showMessage(data.message);
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                },
+                error: function () {
+                    showMessage(data.message);
+                }
+            });
+        }
         function loadProducts() {
             $.ajax({
                 url: '{{ url_for('estoque.manage_product') }}?action=list_products',

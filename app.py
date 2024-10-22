@@ -33,9 +33,5 @@ def rh():
 def market():
     return render_template('market.html')
 
-# @app.route('/storage', methods=['GET'])
-# def storage():
-#     return render_template('storage.html')
-
 if __name__ == "__main__":
     app.run(debug=True)
