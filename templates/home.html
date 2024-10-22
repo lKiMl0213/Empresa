@@ -46,6 +46,8 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
+                        localStorage.setItem('user', data.name);
+                        console.log(data.name);
                         if (data.user_type === 'rh') {
                             window.location.href = '/rh';
                         } else if (data.user_type === 'storage') {

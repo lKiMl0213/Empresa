@@ -9,24 +9,23 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='storage.css') }}">
 </head>
 
-<body class="storage-page">
-    <div class="upper-bar">
-        <button onclick="setupForm()">Gerenciar Estoque</button>
-        <button onclick="showProducts()">Ver Produtos</button>
-    </div>
-
-    <div class="welcome-section">
-        <h1>Bem-vindo {{ user }} ao Estoque</h1>
-        <button onclick="window.location.href='{{ url_for('home') }}';">Sair</button>
-    </div>
-    <div id="formContainer" style="display:none;">
-        <h2 id="formTitle">Gerenciar Produtos</h2>
+<div class= "estoque-page">
+    <body class="storage-page">
+        <div class="upper-bar">
+            <button onclick="setupForm()">Gerenciar <br> Estoque</button>
+            <div class="welcome-section">
+                <h1>Bem-vindo <span id="user"></span> ao Estoque</h1>
+                <button id="logoutButton">Sair</button>
+            </div>
+            <button onclick="showProducts()">Ver Todos <br> os Produtos</button>
+        </div>
+        <div id="formContainer" style="display:none;">
         <form id="productForm" method="POST" action="{{ url_for('estoque.manage_product') }}"
             onsubmit="handleSubmit(event)">
             <label for="productBarcode">Código de Barras:</label>
             <div class="input-container">
                 <input type="text" id="productBarcode" name="barcode">
-                <input type="button" value="Verificar" onclick="checkBarcode(); document.getElementById('formTitle').style.display='none';">
+                <input type="button" value="Verificar" onclick="checkBarcode();">
             </div>
 
             <div id="additionalFields" style="display:none;">
@@ -67,7 +66,7 @@
                     <select name="year" required>
                         <option value="">Ano</option>
                         {% for year in range(2024, 2040) %}
-                        <option value="{{ year }}">{{ year }}</option>
+                            <option value="{{ year }}">{{ year }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -84,22 +83,38 @@
     <div id="productListContainer" style="display: none;"></div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = localStorage.getItem('user');
+            document.getElementById('user').textContent = user ? user : '';
+            document.getElementById('logoutButton').addEventListener('click', function() {
+                localStorage.removeItem('user');
+                window.location.href = '{{ url_for('home') }}';
+            });
+        });
+
         function setupForm() {
             $('#formContainer').show();
             $('#productListContainer').hide();
             $('#productForm')[0].reset();
             $('#additionalFields').hide();
+            
         }
-        function checkBarcode() {
-            const barcode = $('#productBarcode').val();
+        function checkBarcode(barcodes) {
+            if (barcodes) {
+                barcode = barcodes;
+            } else {
+                barcode = $('#productBarcode').val();
+            }
             $('#additionalFields').find('input, select').val('');
             if (barcode) {
                 $.ajax({
                     url: '{{ url_for('estoque.manage_product') }}?action=check_barcode',
                     type: 'GET',
-                    data: { barcode: barcode },
+                    data: { barcode: barcode }, // , barcodes: barcodes
                     success: function (product) {
                         if (product.exists) {
+                            $('#productBarcode').val(product.barcode);
+                            console.log(product.barcode);
                             $('#productName').val(product.name);
                             $('#buyPrice').val(product.buy_price);
                             $('#sellPrice').val(product.sell_price);
@@ -146,6 +161,8 @@
             alert(message);
         }
 
+        
+
         function addProduct() {
             const form = $('#productForm');
             const formData = new FormData(form[0]);
@@ -169,22 +186,28 @@
             });
         }
 
-        function removeProduct() {
-            const barcode = $('#productBarcode').val();
-            $.ajax({
-                url: '{{ url_for('estoque.manage_product') }}?action=remove_product',
-                type: 'POST',
-                data: { barcode: barcode },
-                success: function (data) {
-                    showMessage(data.message);
-                    setTimeout(function() {
-                        location.reload();
-                    }, 1000);
-                },
-                error: function () {
-                    showMessage(data.message);
-                }
-            });
+        function removeProduct(barcodes) {
+            if (barcodes) {
+                barcode = barcodes;
+            } else {
+                barcode = $('#productBarcode').val();
+            }
+            if (confirm('Tem certeza que deseja remover o produto?')) {
+                $.ajax({
+                    url: '{{ url_for('estoque.manage_product') }}?action=remove_product',
+                    type: 'POST',
+                    data: { barcode: barcode },
+                    success: function (data) {
+                        showMessage(data.message);
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
+                    },
+                    error: function () {
+                        showMessage(data.message);
+                    }
+                });
+            }
         }
         function loadProducts() {
             $.ajax({
@@ -204,10 +227,11 @@
                                         '<th>Preço de Compra</th>' +
                                         '<th>Preço de Venda</th>' +
                                         '<th>Data de Validade</th>' +
+                                        '<th>Ações</th>' +
                                     '</tr>' +
                                 '</thead>' +
-                            '<tbody>' +
-                            '</tbody>' +
+                                '<tbody>' +
+                                '</tbody>' +
                             '</table>'
                         );
                         let tbody = productList.find('tbody')
@@ -220,8 +244,21 @@
                                     <td>${product.buy_price}</td>
                                     <td>${product.sell_price}</td>
                                     <td>${product.expiration_date}</td>
+                                    <td>
+                                        <input type="button" value="Editar" class="editButton" data-barcode="${product.barcode}">
+                                        <input type="button" value="Remover" class="removeButton" data-barcode="${product.barcode}">
+                                    </td>
                                 </tr>
                             `);
+                        });
+                        $('.editButton').on('click', function() {
+                            let barcodes = $(this).data('barcode');
+                            setupForm(barcodes);
+                            checkBarcode(barcodes);
+                        });
+                        $('.removeButton').on('click', function() {
+                            let barcodes = $(this).data('barcode');
+                            removeProduct(barcodes);
                         });
                         $('#formContainer').hide();
                         $('#productListContainer').show();

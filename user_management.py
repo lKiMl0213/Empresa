@@ -32,7 +32,8 @@ def login():
 def user_type(user, login):
     if len(user) < 8:
         return jsonify(success=False, message="Tipo de usuário não encontrado.")
-    return jsonify(success=True, user_type=user[7], login=login)
+    name = user[3]
+    return jsonify(success=True, user_type=user[7], login=login, name=name)
 
 
 def register_user(login, hashed_password, name, birthday, cpf, email, user_type):
@@ -99,8 +100,5 @@ def recovery():
             return jsonify(success=False)
     return render_template('recovery.html')
 
-def user_type(user, login):
-    if len(user) < 8:
-        return jsonify(success=False, message="Tipo de usuário não encontrado.")
-    return jsonify(success=True, user_type=user[7], login=login)
+
 

@@ -31,6 +31,7 @@ def manage_product():
                 year = str(expiration_date_str.year)
                 return jsonify({
                     'exists': True,
+                    'barcode': product[1],
                     'name': product[2],
                     'buy_price': product[3],
                     'sell_price': product[4],
@@ -68,7 +69,7 @@ def manage_product():
             return jsonify(success=True, products=closed_to_expire)
         if action == 'list_products':
             cursor = get_cursor()
-            cursor.execute("SELECT * FROM products")
+            cursor.execute("SELECT * FROM products order by name")
             products = cursor.fetchall()
             close_cursor(cursor)
 
