@@ -27,9 +27,9 @@
                             <input type="password" id="password" name="password" required minlength="8" placeholder="Digite sua senha">
                             <label for="confirmPassword">Confirme sua senha:</label>
                             <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8" placeholder="Confirme sua senha">
-                            <label for="id">ID de Acesso:</label>
-                            <p id="id"></p>
-                            <button onclick="generateId()">Gerar ID</button>
+                            <label for="code">Código de Acesso:</label>
+                            <p id="code"></p>
+                            <button onclick="generateCode()">Gerar Código</button>
 
                             <div id="personalData">
 
@@ -82,6 +82,25 @@
                                             <option value="{{ year }}">{{ year }}</option>
                                         {% endfor %}
                                     </select>
+                                    <label for="gender">Sexo:</label>
+                                    <select name="gender" required>
+                                        <option value="">Sexo</option>
+                                        <option value="Masculino">Masculino</option>
+                                        <option value="Feminino">Feminino</option>
+                                        <option value="Outro">Outro</option>
+                                    </select>
+                                    <label for="maritalStatus">Estado Civil:</label>
+                                    <select name="maritalStatus" required>
+                                        <option value="">Estado Civil</option>
+                                        <option value="Solteiro">Solteiro</option>
+                                        <option value="Casado">Casado</option>
+                                        <option value="Divorciado">Divorciado</option>
+                                        <option value="Viuvo">Viúvo</option>
+                                    </select>
+                                    <label for="address">Endereço:</label>
+                                    <input type="text" id="address" name="address" required placeholder="Digite seu endereço">
+                                    <label for="cep">CEP:</label>
+                                    <input type="text" id="cep" name="cep" required placeholder="Digite seu CEP">
                                     <label for="academicFormation">Formação Acadêmica:</label>
                                     <select name="academicFormation" required>
                                         <option value="">Formação Acadêmica</option>
@@ -229,9 +248,9 @@
                                 });
                             });
                             
-                            function generateId() {
+                            function generateCode() {
                                 let result = '';
-                                document.getElementById('id').textContent = generateRandomNumbers(9);
+                                document.getElementById('code').textContent = generateRandomNumbers(9);
                             }
                             function generateRandomNumbers(length) {
                                 let result ='';
@@ -249,8 +268,6 @@
                                 $('#formContainer').show();
                                 $('#employeeListContainer').hide();
                                 $('#employeeForm')[0].reset();
-                                $('#additionalFields').hide();
-                                $('#buttonsContainer').hide();
                             }
 
                             function showMessage(message) {
@@ -279,6 +296,7 @@
                             function showEmployees() {
                                 loadEmployees();
                                 $('#formContainer').hide();
+                                $('#employeeForm')[0].reset();
                                 $('#employeeListContainer').show();
                             }
 
@@ -295,8 +313,9 @@
                                                 '<thead>' +
                                                     '<tr>' +
                                                         '<th>Foto</th>' +
+                                                        '<th>Código</th>' +
+                                                        '<th>Login</th>' +
                                                         '<th>Nome</th>' +
-                                                        '<th>ID</th>' +
                                                         '<th>Departamento</th>' +
                                                         '<th>Cargo</th>' +
                                                         '<th>Status</th>' +
@@ -311,20 +330,21 @@
                                                 tbody.append(`
                                                     <tr>
                                                         <td><img src="${employee.photo}" alt="Foto do Funcionário"></td>
+                                                        <td>${employee.code}</td>
+                                                        <td>${employee.login}</td>
                                                         <td>${employee.name}</td>
-                                                        <td>${employee.id}</td>
                                                         <td>${employee.department}</td>
                                                         <td>${employee.position}</td>
                                                         <td>${employee.status}</td>
                                                         <td>
-                                                            <input type="button" value="Editar" class="editButton" data-id="${employee.id}">
+                                                            <input type="button" value="Editar" class="editButton" data-code="${employee.code}">
                                                         </td>
                                                     </tr>
                                                 `);
                                             });
                                             $('.editButton').on('click', function() {
-                                                let id = $(this).data('id');
-                                                setupForm(id);
+                                                let code = $(this).data('code');
+                                                setupForm(code);
                                             });
                                             $('#formContainer').hide();
                                             $('#employeeListContainer').show();
@@ -349,7 +369,6 @@
                                     success: function (data) {
                                         showMessage(data.message);
                                         form[0].reset();
-                                        $('#additionalFields').hide();
                                         setTimeout(function() {
                                             location.reload();
                                         }, 1000);
@@ -359,23 +378,23 @@
                                     }
                                 });
                             }
-                            function checkId(id) {
-                                if (id) {
-                                    ids = id;
+                            function checkCode(code) {
+                                if (code) {
+                                    codes = code;
                                 } else {
-                                    ids = $('#id').val();
+                                    codes = $('#code').val();
                                 }
                                 $.ajax({
-                                    url: '{{ url_for('rh_management.manage_employee') }}?action=check_id',
+                                    url: '{{ url_for('rh_management.manage_employee') }}?action=check_code',
                                     type: 'GET',
-                                    data: { id: id }, // , id: id
+                                    data: { code: code }, // , id: id
                                     success: function (data) {
                                         if (data.exists) {
-                                            $('#id').val(data.id);
-                                            $('#id').attr('readonly', true);
+                                            $('#photo').val(data.photo);
+                                            $('#code').val(data.code);
+                                            $('#code').attr('readonly', true);
                                             $('#login').val(data.login);
                                             $('#login').attr('readonly', true);
-                                            $('#password').val(data.password);
                                             $('#myfile').val(data.photo);
                                             $('#name').val(data.name);
                                             $('#phone').val(data.phone);
@@ -403,6 +422,10 @@
                                                 }
                                             });
                                             $('select[name="birthdayYear"]').val(data.year);
+                                            $('select[name="gender"]').val(data.gender);
+                                            $('select[name="maritalStatus"]').val(data.maritalStatus);
+                                            $('#address').val(data.address);
+                                            $('#cep').val(data.cep);
                                             $('#academicFormation').val(data.academicFormation);
                                             $('#salary').val(data.salary);
                                             $('#department').val(data.department);
@@ -434,11 +457,7 @@
                                                 };
                                             });
                                             $('#dateOfDismissalYear').val(data.dateOfDismissalYear);
-                                            $('#additionalFields').show();
-                                            $('#buttonsContainer').show();
                                         } else {
-                                            $('#additionalFields').hide();
-                                            $('#buttonsContainer').hide();
                                         }
                                     },
                                     error: function () {
