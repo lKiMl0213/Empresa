@@ -34,10 +34,15 @@ def manage_employee():
                 admission_month = str(admission_date.month).zfill(2)
                 admission_year = str(admission_date.year)
                 admission_day = str(admission_date.day).zfill(2)
-                date_of_dismissal_date = employee[29]
-                date_of_dismissal_month = str(date_of_dismissal_date.month).zfill(2)
-                date_of_dismissal_year = str(date_of_dismissal_date.year)
-                date_of_dismissal_day = str(date_of_dismissal_date.day).zfill(2)
+                if employee[29]:
+                    date_of_dismissal_date = employee[29]
+                    date_of_dismissal_month = str(date_of_dismissal_date.month).zfill(2)
+                    date_of_dismissal_year = str(date_of_dismissal_date.year)
+                    date_of_dismissal_day = str(date_of_dismissal_date.day).zfill(2)
+                else:
+                    date_of_dismissal_month = " none"
+                    date_of_dismissal_year = " none"
+                    date_of_dismissal_day = " none"
                 return jsonify({
                     'exists': True,
                     'photo': employee[1],
@@ -84,7 +89,6 @@ def manage_employee():
             cursor.execute("SELECT * FROM employees order by name")
             employees = cursor.fetchall()
             close_cursor(cursor)
-            return jsonify(employees=employees)
             employee_list = []
             for employee in employees:
                 employee_list.append({
@@ -113,7 +117,7 @@ def manage_employee():
             birth_day = data.get('birth_day').strip()
             birth_month = data.get('birth_month').strip()
             birth_year = data.get('birth_year').strip()
-            birth_date = f"{birth_year}-{birth_month}-{birth_day}.zfill(2)"
+            birth_date = f"{birth_year}-{birth_month.zfill(2)}-{birth_day.zfill(2)}"
             gender = data.get('gender')
             marital_status = data.get('marital_status')
             address = data.get('address')
@@ -135,16 +139,18 @@ def manage_employee():
             admission_day = data.get('admission_day').strip()
             admission_month = data.get('admission_month').strip()
             admission_year = data.get('admission_year').strip()
-            admission_date = f"{admission_year}-{admission_month}-{admission_day}.zfill(2)"
+            admission_date = f"{admission_year}-{admission_month.zfill(2)}-{admission_day.zfill(2)}"
             status = data.get('status')
             inactive_status = data.get('inactive_status')
             date_of_dismissal_day = data.get('date_of_dismissal_day').strip()
             date_of_dismissal_month = data.get('date_of_dismissal_month').strip()
             date_of_dismissal_year = data.get('date_of_dismissal_year').strip()
-            date_of_dismissal_date = f"{date_of_dismissal_year}-{date_of_dismissal_month}-{date_of_dismissal_day}.zfill(2)"
+            date_of_dismissal_date = f"{date_of_dismissal_year}-{date_of_dismissal_month.zfill(2)}-{date_of_dismissal_day.zfill(2)}"
             birth_date_obj = datetime.datetime.strptime(birth_date, '%Y-%m-%d')
             admission_date_obj = datetime.datetime.strptime(admission_date, '%Y-%m-%d')
             date_of_dismissal_date_obj = datetime.datetime.strptime(date_of_dismissal_date, '%Y-%m-%d')
+
+            hashed_password = scrypt.hash(password)
 
             if not all([code, login, password, name, cpf]):
                 return jsonify(success=False, message="Todos os campos são obrigatórios.")
@@ -186,14 +192,15 @@ def manage_employee():
                     status = %s,
                     inactive_status = %s,
                     date_of_dismissal_date = %s
-                """, (login, password, name, phone, email, cpf, birth_date_obj, gender, marital_status, address, cep, academic_formation, salary, department, position, benefits1, benefits2, benefits3, benefits4, benefits5, benefits6, benefits7, benefits8, benefits9, benefits10, admission_date_obj, status, inactive_status, date_of_dismissal_date_obj))
+                where code = %s
+                """, (login, hashed_password, name, phone, email, cpf, birth_date_obj, gender, marital_status, address, cep, academic_formation, salary, department, position, benefits1, benefits2, benefits3, benefits4, benefits5, benefits6, benefits7, benefits8, benefits9, benefits10, admission_date_obj, status, inactive_status, date_of_dismissal_date_obj))
                 mysql.connection.commit()
                 close_cursor(cursor)
                 return jsonify(success=True, message="Funcionário atualizado com sucesso.")
             else:
                 cursor.execute("""
                     INSERT INTO employees (code, login, password, name, phone, email, cpf, birth_date, gender, marital_status, address, cep, academic_formation, salary, department, position, benefits1, benefits2, benefits3, benefits4, benefits5, benefits6, benefits7, benefits8, benefits9, benefits10, admission_date, status, inactive_status, date_of_dismissal_date)
-                """, (code, login, password, name, phone, email, cpf, birth_date_obj, gender, marital_status, address, cep, academic_formation, salary, department, position, benefits1, benefits2, benefits3, benefits4, benefits5, benefits6, benefits7, benefits8, benefits9, benefits10, admission_date_obj, status, inactive_status, date_of_dismissal_date_obj))
+                """, (code, login, hashed_password, name, phone, email, cpf, birth_date_obj, gender, marital_status, address, cep, academic_formation, salary, department, position, benefits1, benefits2, benefits3, benefits4, benefits5, benefits6, benefits7, benefits8, benefits9, benefits10, admission_date_obj, status, inactive_status, date_of_dismissal_date_obj))
                 mysql.connection.commit()
                 close_cursor(cursor)
                 return jsonify(success=True, message="Funcionário cadastrado com sucesso.")
