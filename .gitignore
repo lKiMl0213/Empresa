@@ -2,3 +2,5 @@
 __pycache__
 db
 .DS_Store
+_pgbackup
+_pginfo
