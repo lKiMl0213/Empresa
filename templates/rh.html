@@ -21,223 +21,265 @@
                 <form id="employeeForm" method="POST" action="{{ url_for('rh_management.manage_employee') }}" onsubmit="handleSubmit(event)">
                     <div class="container-register">
                         <h1>Registrar Funcionário</h1>
+                        <div id="login">
                             <label for="login">Nome de Usuário:</label>
-                            <input type="text" id="login" name="login" required minlength="5" pattern="[a-z0-9]+" placeholder="Digite seu nome de usuário">
-                            <label for="password">Senha:</label>
-                            <input type="password" id="password" name="password" required minlength="8" placeholder="Digite sua senha">
-                            <label for="confirmPassword">Confirme sua senha:</label>
-                            <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8" placeholder="Confirme sua senha">
-                            <label for="code">Código de Acesso:</label>
-                            <p id="code"></p>
-                            <button onclick="generateCode()">Gerar Código</button>
-
-                            <div id="personalData">
-
-                                <h3>Dados Pessoais</h3>
-                                <label for="myfile">Selecione um arquivo:</label>
-                                <input type="file" id="myfile" name="myfile"><br><br>
-                                <label for="name">Nome Completo do Funcionário:</label>
-                                <input type="text" id="name" name="name" required placeholder="Digite seu nome completo">
-                                
-                                <label for="phone">Telefone:</label><br><br>
-                                <input type="tel" id="phone" name="phone" placeholder="(99) 99 9 9999-9999" required><br><br>
-                                <small>Format: (99) 99 9 9999-9999</small><br><br>
-                                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-                                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-
-                                <label for="email">Email:</label>
-                                <input type="email" id="email" name="email" required placeholder="Digite seu email">
-                                <label for="cpf">CPF:</label>
-                                <input type="text" id="cpf" name="cpf" required placeholder="Digite seu CPF">
-                                <label for="birthday">Data de Nascimento:</label>
-                                <div class="select-container-data" required>
-                                    <select name="birthdayDay" required>
-                                        <option value="">Dia</option>
-                                        {% for day in range(1, 32) %}
-                                            <option value="{{ day }}">{{ day }}</option>
-                                        {% endfor %}
-                                    </select>
-                                    <select name="birthdayMonth" required>
-                                        <option value="">Mês</option>
-                                        {% set months = {
-                                            1: "Janeiro",
-                                            2: "Fevereiro", 
-                                            3: "Março", 
-                                            4: "Abril", 
-                                            5: "Maio", 
-                                            6: "Junho",
-                                            7: "Julho", 
-                                            8: "Agosto", 
-                                            9: "Setembro", 
-                                            10: "Outubro", 
-                                            11: "Novembro", 
-                                            12: "Dezembro" } %}
-                                        {% for month in range(1, 13) %}
-                                            <option value="{{ " %02d"|format(month) }}">{{ months[month] }}</option>
-                                        {% endfor %}
-                                    </select>
-                                    <select name="birthdayYear" required>
-                                        <option value="">Ano</option>
-                                        {% for year in range(2024, 2040) %}
-                                            <option value="{{ year }}">{{ year }}</option>
-                                        {% endfor %}
-                                    </select>
-                                    <label for="gender">Sexo:</label>
-                                    <select name="gender" required>
-                                        <option value="">Sexo</option>
-                                        <option value="Masculino">Masculino</option>
-                                        <option value="Feminino">Feminino</option>
-                                        <option value="Outro">Outro</option>
-                                    </select>
-                                    <label for="maritalStatus">Estado Civil:</label>
-                                    <select name="maritalStatus" required>
-                                        <option value="">Estado Civil</option>
-                                        <option value="Solteiro">Solteiro</option>
-                                        <option value="Casado">Casado</option>
-                                        <option value="Divorciado">Divorciado</option>
-                                        <option value="Viuvo">Viúvo</option>
-                                    </select>
-                                    <label for="address">Endereço:</label>
-                                    <input type="text" id="address" name="address" required placeholder="Digite seu endereço">
-                                    <label for="cep">CEP:</label>
-                                    <input type="text" id="cep" name="cep" required placeholder="Digite seu CEP">
-                                    <label for="academicFormation">Formação Acadêmica:</label>
-                                    <select name="academicFormation" required>
-                                        <option value="">Formação Acadêmica</option>
-                                        <option value="Ensino Médio">Ensino Médio</option>
-                                        <option value="Ensino Superior">Ensino Superior</option>
-                                        <option value="Pós-Graduação">Pós-Graduação</option>
-                                        <option value="Mestrado">Mestrado</option>
-                                        <option value="Doutorado">Doutorado</option>
-                                    </select>
-                                </div>
-                                <div id="additionalFields" style="display:none;">
-                                    <label for="salary">Salário:</label>
-                                    <input type="number" id="salary" name="salary" required step="0.01" min="0">
-                                    <label for="department">Departamento:</label>
-                                    <div class="select-container">
-                                        <select name="type" required>
-                                            <option value="">Tipo</option>
-                                            <option value="rh">Gerente</option>
-                                            <option value="market">Vendedor</option>
-                                            <option value="storage">Atendente</option>
-                                        </select>
-                                    </div>
-                                    <label for="position">Cargo:</label>
-                                    <input type="text" id="position" name="position" required placeholder="Digite o cargo">
-                                    <div class="benefits">
-                                        <div id="benefitsTitle"></div>
-                                        <h2>Benefícios:</h2>
-                                        <label for="benefits1">Vale Refeição</label>
-                                        <input type="checkbox" id="benefits1" name="benefits1" value="Vale Refeição">
-                                        <label for="benefits2">Vale Transporte</label>
-                                        <input type="checkbox" id="benefits2" name="benefits2" value="Vale Transporte">
-                                        <label for="benefits3">Plano de Saúde</label>
-                                        <input type="checkbox" id="benefits3" name="benefits3" value="Plano de Saúde">
-                                        <label for="benefits4">Plano Odontológico</label>
-                                        <input type="checkbox" id="benefits4" name="benefits4" value="Plano Odontológico">
-                                        <label for="benefits5">Seguro de Vida</label>
-                                        <input type="checkbox" id="benefits5" name="benefits5" value="Seguro de Vida">
-                                        <label for="benefits6">Auxílio Creche</label>
-                                        <input type="checkbox" id="benefits6" name="benefits6" value="Auxílio Creche">
-                                        <label for="benefits7">Auxílio Alimentação</label>
-                                        <input type="checkbox" id="benefits7" name="benefits7" value="Auxílio Alimentação">
-                                        <label for="benefits8">Gympass</label>
-                                        <input type="checkbox" id="benefits8" name="benefits8" value="Gympass">
-                                        <label for="benefits9">Participação nos Lucros</label>
-                                        <input type="checkbox" id="benefits9" name="benefits9" value="Participação nos Lucros">
-                                        <label for="benefits10">14º Salário</label>
-                                        <input type="checkbox" id="benefits10" name="benefits10" value="14º Salário">
-                                    </div>
-                                    <label for="admissionDate">Data de Admissão:</label>
-                                    <div class="select-container-data" required>
-                                        <select name="admissionDay" required>
-                                            <option value="">Dia</option>
-                                            {% for day in range(1, 32) %}
-                                                <option value="{{ day }}">{{ day }}</option>
-                                            {% endfor %}
-                                        </select>
-                                        <select name="admissionMonth" required>
-                                            <option value="">Mês</option>
-                                            {% set months = {
-                                                1: "Janeiro",
-                                                2: "Fevereiro", 
-                                                3: "Março", 
-                                                4: "Abril", 
-                                                5: "Maio", 
-                                                6: "Junho",
-                                                7: "Julho", 
-                                                8: "Agosto", 
-                                                9: "Setembro", 
-                                                10: "Outubro", 
-                                                11: "Novembro", 
-                                                12: "Dezembro" } %}
-                                            {% for month in range(1, 13) %}
-                                                <option value="{{ " %02d"|format(month) }}">{{ months[month] }}</option>
-                                            {% endfor %}
-                                        </select>
-                                        <select name="admissionYear" required>
-                                            <option value="">Ano</option>
-                                            {% for year in range(2024, 2040) %}
-                                                <option value="{{ year }}">{{ year }}</option>
-                                            {% endfor %}
-                                        </select>
-                                        <label for="employeeStatus">Status:</label>
-                                        <select name="status" required>
-                                            <option value="">Status</option>
-                                            <option value="active">Ativo</option>
-                                            <option value="on_vacation">Em férias</option>
-                                            <option value="sick">Doente</option>
-                                            <option value="inactive">Inativo</option>
-                                        </select>
-                                        <div class="status">
-                                            <select name="inactiveStatus">
-                                                <option value="">Motivo da Inativação</option>
-                                                <option value="resignation">Demissão</option>
-                                                <option value="fired">Desligamento</option>
-                                            </select>
-                                            <select name="dateOfDismissal">
-                                                <select name="dateOfDismissalDay" required>
-                                                    <option value="">Dia</option>
-                                                    {% for day in range(1, 32) %}
-                                                        <option value="{{ day }}">{{ day }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                                <select name="dateOfDismissalMonth" required>
-                                                    <option value="">Mês</option>
-                                                    {% set months = {
-                                                        1: "Janeiro",
-                                                        2: "Fevereiro", 
-                                                        3: "Março", 
-                                                        4: "Abril", 
-                                                        5: "Maio", 
-                                                        6: "Junho",
-                                                        7: "Julho", 
-                                                        8: "Agosto", 
-                                                        9: "Setembro", 
-                                                        10: "Outubro", 
-                                                        11: "Novembro", 
-                                                        12: "Dezembro" } %}
-                                                    {% for month in range(1, 13) %}
-                                                        <option value="{{ " %02d"|format(month) }}">{{ months[month] }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                                <select name="dateOfDismissalYear" required>
-                                                    <option value="">Ano</option>
-                                                    {% for year in range(2024, 2040) %}
-                                                        <option value="{{ year }}">{{ year }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="buttonsContainer" style="display:none;">
-                                    <input type="button" value="Salvar" onclick="insertEmployee()">
-                                </div>
-                            </form>
+                            <input type="text" id="login" name="login" required>
                         </div>
-                        <div id="employeeListContainer" style="display: none;"></div>
+                        <div id="passwordContainer">  
+                            <label for="password">Senha:</label>
+                            <input type="password" id="password" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="A senha deve conter pelo menos um número, uma letra maiúscula e uma letra minúscula, e pelo menos 8 caracteres" required>
+                        </div>
+                        <div id="message">
+                            <small>A senha deve conter:</small>
+                            <div class="rules">
+                                <p id="letter" class="invalid"><span class="icon">❌</span> Uma letra minúscula</p>
+                                <p id="capital" class="invalid"><span class="icon">❌</span> Uma letra maiúscula</p>
+                                <p id="number" class="invalid"><span class="icon">❌</span> Um número</p>
+                                <p id="length" class="invalid"><span class="icon">❌</span> e pelo menos 8 caracteres</p>
+                            </div>
+                        </div>
+                        <div id="login">
+                            <label for="confirmPassword">Confirme sua senha:</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" required>
+                        </div>
+                    </div>
+                    <div id="cod">
+                        <label for="code">Código de Acesso:</label>
+                        <p id="code"></p>
+                        <button onclick="generateCode()">Gerar Código</button>
+                    </div>
+                    <div id="personalData">
+                        <h3>Dados Pessoais</h3>
+                        <div id="photo">
+                            <label for="myfile">Foto do Funcionário 3x4:</label>
+                            <input type="file" id="myfile" name="myfile">
+                            <small>Formato: .jpg, .jpeg, .png</small>
+                            <small>Tamanho máximo: 5MB</small>
+                        </div>
+                        <label for="name">Nome Completo do Funcionário:</label>
+                        <input type="text" id="name" name="name" required placeholder="Nome Completo do Funcionário">
+                        <div id="number">
+                            <label for="phone">Telefone:</label>
+                            <input type="tel" id="phone" name="phone" placeholder="(99) 99 9 9999-9999"><br>
+                            <small>Format: (99) 99 9 9999-9999</small>
+                            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+                            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+                        </div>
+                        <div id="email">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" name="email" required placeholder="Digite seu email">
+                        </div>
+                        <div id="cpf">
+                            <label for="cpf">CPF:</label>
+                            <input type="text" id="cpf" name="cpf" required placeholder="Digite seu CPF">
+                        </div>
+                        <div id="birthday">
+                            <label for="birthday">Data de Nascimento:</label>
+                            <div class="select-container-data" required>
+                                <select name="birthdayDay" required>
+                                    <option value="">Dia</option>
+                                    {% for day in range(1, 32) %}
+                                        <option value="{{ day }}">{{ day }}</option>
+                                    {% endfor %}
+                                </select>
+                                <select name="birthdayMonth" required>
+                                    <option value="">Mês</option>
+                                    {% set months = {
+                                        1: "Janeiro",
+                                        2: "Fevereiro", 
+                                        3: "Março", 
+                                        4: "Abril", 
+                                        5: "Maio", 
+                                        6: "Junho",
+                                        7: "Julho", 
+                                        8: "Agosto", 
+                                        9: "Setembro", 
+                                        10: "Outubro", 
+                                        11: "Novembro", 
+                                        12: "Dezembro" } %}
+                                    {% for month in range(1, 13) %}
+                                        <option value="{{ " %02d"|format(month) }}">{{ months[month] }}</option>
+                                    {% endfor %}
+                                </select>
+                                <select name="birthdayYear" required>
+                                    <option value="">Ano</option>
+                                    {% for year in range(2024, 2040) %}
+                                        <option value="{{ year }}">{{ year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <label for="gender">Sexo:</label>
+                            <select name="gender" required>
+                                <option value="">Sexo</option>
+                                <option value="Masculino">Masculino</option>
+                                <option value="Feminino">Feminino</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                        <div id="maritalStatus">
+                            <label for="maritalStatus">Estado Civil:</label>
+                            <select name="maritalStatus" required>
+                                <option value="">Estado Civil</option>
+                                <option value="Solteiro">Solteiro</option>
+                                <option value="Casado">Casado</option>
+                                <option value="Divorciado">Divorciado</option>
+                                <option value="Viuvo">Viúvo</option>
+                            </select>
+                        </div>
+                        <label for="address">Endereço:</label>
+                        <input type="text" id="address" name="address" required placeholder="Digite seu endereço">
+                        <div id="cep"></div>
+                        <label for="cep">CEP:</label>
+                        <input type="text" id="cep" name="cep" required placeholder="Digite seu CEP">
+                    </div>
+                    <div id="academicFormation">
+                        <label for="academicFormation">Formação Acadêmica:</label>
+                        <select name="academicFormation" required>
+                            <option value="">Formação Acadêmica</option>
+                            <option value="Ensino Médio">Ensino Médio</option>
+                            <option value="Ensino Superior">Ensino Superior</option>
+                            <option value="Pós-Graduação">Pós-Graduação</option>
+                            <option value="Mestrado">Mestrado</option>
+                            <option value="Doutorado">Doutorado</option>
+                        </select>
+                    </div>
+                    <div id="salary">
+                        <label for="salary">Salário:</label>
+                        <input type="number" id="salary" name="salary" required step="0.01" min="0">
+                    </div>
+                    <div id="department">
+                        <label for="department">Departamento:</label>
+                        <div class="select-container">
+                            <select name="type" required>
+                                <option value="">Tipo</option>
+                                <option value="rh">Gerente</option>
+                                <option value="market">Vendedor</option>
+                                <option value="storage">Atendente</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="position">
+                        <label for="position">Cargo:</label>
+                        <input type="text" id="position" name="position" required placeholder="Digite o cargo">
+                    </div>
+                    <div id="benefits">
+                        <div id="benefitsTitle"></div>
+                        <h2>Benefícios:</h2>
+                        <label for="benefits1">Vale Refeição</label>
+                        <input type="checkbox" id="benefits1" name="benefits1" value="Vale Refeição">
+                        <label for="benefits2">Vale Transporte</label>
+                        <input type="checkbox" id="benefits2" name="benefits2" value="Vale Transporte">
+                        <label for="benefits3">Plano de Saúde</label>
+                        <input type="checkbox" id="benefits3" name="benefits3" value="Plano de Saúde">
+                        <label for="benefits4">Plano Odontológico</label>
+                        <input type="checkbox" id="benefits4" name="benefits4" value="Plano Odontológico">
+                        <label for="benefits5">Seguro de Vida</label>
+                        <input type="checkbox" id="benefits5" name="benefits5" value="Seguro de Vida">
+                        <label for="benefits6">Auxílio Creche</label>
+                        <input type="checkbox" id="benefits6" name="benefits6" value="Auxílio Creche">
+                        <label for="benefits7">Auxílio Alimentação</label>
+                        <input type="checkbox" id="benefits7" name="benefits7" value="Auxílio Alimentação">
+                        <label for="benefits8">Gympass</label>
+                        <input type="checkbox" id="benefits8" name="benefits8" value="Gympass">
+                        <label for="benefits9">Participação nos Lucros</label>
+                        <input type="checkbox" id="benefits9" name="benefits9" value="Participação nos Lucros">
+                        <label for="benefits10">14º Salário</label>
+                        <input type="checkbox" id="benefits10" name="benefits10" value="14º Salário">
+                    </div>
+                    <label for="admissionDate">Data de Admissão:</label>
+                    <div id=birthday>
+                        <select name="admissionDay" required>
+                            <option value="">Dia</option>
+                            {% for day in range(1, 32) %}
+                                <option value="{{ day }}">{{ day }}</option>
+                            {% endfor %}
+                        </select>
+                        <select name="admissionMonth" required>
+                            <option value="">Mês</option>
+                            {% set months = {
+                                1: "Janeiro",
+                                2: "Fevereiro", 
+                                3: "Março", 
+                                4: "Abril", 
+                                5: "Maio", 
+                                6: "Junho",
+                                7: "Julho", 
+                                8: "Agosto", 
+                                9: "Setembro", 
+                                10: "Outubro", 
+                                11: "Novembro", 
+                                12: "Dezembro" } %}
+                            {% for month in range(1, 13) %}
+                                <option value="{{ " %02d"|format(month) }}">{{ months[month] }}</option>
+                            {% endfor %}
+                        </select>
+                        <select name="admissionYear" required>
+                            <option value="">Ano</option>
+                            {% for year in range(2024, 2040) %}
+                                <option value="{{ year }}">{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div id="status">
+                        <label for="employeeStatus">Status:</label>
+                        <select name="status" required>
+                            <option value="">Status</option>
+                            <option value="active">Ativo</option>
+                            <option value="on_vacation">Em férias</option>
+                            <option value="sick">Doente</option>
+                            <option value="inactive">Inativo</option>
+                        </select>
+                        <div class="status">
+                            <select name="inactiveStatus">
+                                <option value="">Motivo da Inativação</option>
+                                <option value="resignation">Demissão</option>
+                                <option value="fired">Desligamento</option>
+                            </select>
+                        </div>
+                        <div id="birthday">
+                            <select name="dateOfDismissal">
+                                <select name="dateOfDismissalDay" required>
+                                    <option value="">Dia</option>
+                                    {% for day in range(1, 32) %}
+                                        <option value="{{ day }}">{{ day }}</option>
+                                    {% endfor %}
+                                </select>
+                                <select name="dateOfDismissalMonth" required>
+                                    <option value="">Mês</option>
+                                    {% set months = {
+                                        1: "Janeiro",
+                                        2: "Fevereiro", 
+                                        3: "Março", 
+                                        4: "Abril", 
+                                        5: "Maio", 
+                                        6: "Junho",
+                                        7: "Julho", 
+                                        8: "Agosto", 
+                                        9: "Setembro", 
+                                        10: "Outubro", 
+                                        11: "Novembro", 
+                                        12: "Dezembro" } %}
+                                    {% for month in range(1, 13) %}
+                                        <option value="{{ " %02d"|format(month) }}">{{ months[month] }}</option>
+                                    {% endfor %}
+                                </select>
+                                <select name="dateOfDismissalYear" required>
+                                    <option value="">Ano</option>
+                                    {% for year in range(2024, 2040) %}
+                                        <option value="{{ year }}">{{ year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </select>
+                    </div>
+                </div>
+                <div id="buttonsContainer" style="display:none;">
+                    <input type="button" value="Salvar" onclick="insertEmployee()">
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="employeeListContainer" style="display: none;"></div>
                         <script>
                             document.addEventListener('DOMContentLoaded', function() {
                                 const user = localStorage.getItem('user');
@@ -247,10 +289,75 @@
                                     window.location.href = '{{ url_for('home') }}';
                                 });
                             });
-                            
+
+                            var myInput = document.getElementById("password");
+                            var letter = document.getElementById("letter");
+                            var capital = document.getElementById("capital");
+                            var number = document.getElementById("number");
+                            var length = document.getElementById("length");
+
+                            // Exibe a caixa de mensagem ao clicar no campo de senha
+                            myInput.onfocus = function() {
+                                document.getElementById("message").style.display = "block";
+                            }
+
+                            // Oculta a caixa de mensagem ao clicar fora do campo de senha
+                            myInput.onblur = function() {
+                                document.getElementById("message").style.display = "none";
+                            }
+
+                            // Validação das regras conforme o usuário digita
+                            myInput.onkeyup = function() {
+                                // Valida letras minúsculas
+                                var lowerCaseLetters = /[a-z]/g;
+                                if (myInput.value.match(lowerCaseLetters)) {
+                                    letter.classList.remove("invalid");
+                                    letter.classList.add("valid");
+                                    letter.querySelector(".icon").textContent = "✔️"; // Muda o ícone para check
+                                } else {
+                                    letter.classList.remove("valid");
+                                    letter.classList.add("invalid");
+                                    letter.querySelector(".icon").textContent = "❌"; // Muda o ícone para X
+                                }
+
+                                // Valida letras maiúsculas
+                                var upperCaseLetters = /[A-Z]/g;
+                                if (myInput.value.match(upperCaseLetters)) {
+                                    capital.classList.remove("invalid");
+                                    capital.classList.add("valid");
+                                    capital.querySelector(".icon").textContent = "✔️";
+                                } else {
+                                    capital.classList.remove("valid");
+                                    capital.classList.add("invalid");
+                                    capital.querySelector(".icon").textContent = "❌";
+                                }
+
+                                // Valida números
+                                var numbers = /[0-9]/g;
+                                if (myInput.value.match(numbers)) {
+                                    number.classList.remove("invalid");
+                                    number.classList.add("valid");
+                                    number.querySelector(".icon").textContent = "✔️";
+                                } else {
+                                    number.classList.remove("valid");
+                                    number.classList.add("invalid");
+                                    number.querySelector(".icon").textContent = "❌";
+                                }
+
+                                // Valida o comprimento mínimo
+                                if (myInput.value.length >= 8) {
+                                    length.classList.remove("invalid");
+                                    length.classList.add("valid");
+                                    length.querySelector(".icon").textContent = "✔️";
+                                } else {
+                                    length.classList.remove("valid");
+                                    length.classList.add("invalid");
+                                    length.querySelector(".icon").textContent = "❌";
+                                }
+                            }
                             function generateCode() {
                                 let result = '';
-                                document.getElementById('code').textContent = generateRandomNumbers(9);
+                                document.getElementById('code').textContent = generateRandomNumbers(13);
                             }
                             function generateRandomNumbers(length) {
                                 let result ='';
@@ -281,7 +388,7 @@
                                 if (cpf == "00000000000") return false;
 
                                 for (i = 1; i < 9; i++) Soma = Soma + parseInt(cpf.substrin(i - 1, i)) * (11 - i);
-                                resto = (Soma * 10) % 11;
+                                Resto = (Soma * 10) % 11;
                                 if ((Resto == 10) || (Resto == 11)) Resto = 0;
                                 if (Resto != parseInt(cpf.subtring(9, 10))) return false;
                                 Soma = 0;
