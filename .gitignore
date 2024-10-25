@@ -4,3 +4,7 @@ db
 .DS_Store
 _pgbackup
 _pginfo
+#docker
+.log
+docker-compose.override.yml
+container_info.json

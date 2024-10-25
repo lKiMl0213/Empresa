@@ -126,16 +126,18 @@ def manage_employee():
             salary = data.get('salary')
             department = data.get('department')
             position = data.get('position')
-            benefits1 = data.get('benefits1')
-            benefits2 = data.get('benefits2')
-            benefits3 = data.get('benefits3')
-            benefits4 = data.get('benefits4')
-            benefits5 = data.get('benefits5')
-            benefits6 = data.get('benefits6')
-            benefits7 = data.get('benefits7')
-            benefits8 = data.get('benefits8')
-            benefits9 = data.get('benefits9')
-            benefits10 = data.get('benefits10')
+            benefits = {
+                'benefits1': data.get('benefits1'),
+                'benefits2': data.get('benefits2'),
+                'benefits3': data.get('benefits3'),
+                'benefits4': data.get('benefits4'),
+                'benefits5': data.get('benefits5'),
+                'benefits6': data.get('benefits6'),
+                'benefits7': data.get('benefits7'),
+                'benefits8': data.get('benefits8'),
+                'benefits9': data.get('benefits9'),
+                'benefits10': data.get('benefits10')
+            }
             admission_day = data.get('admission_day').strip()
             admission_month = data.get('admission_month').strip()
             admission_year = data.get('admission_year').strip()
@@ -152,7 +154,7 @@ def manage_employee():
 
             hashed_password = scrypt.hash(password)
 
-            if not all([code, login, password, name, cpf]):
+            if not all([code, login, password, name, email, cpf]):
                 return jsonify(success=False, message="Todos os campos são obrigatórios.")
             
             cursor = get_cursor()
@@ -178,29 +180,20 @@ def manage_employee():
                     salary = %s,
                     department = %s,
                     position = %s,
-                    benefits1 = %s,
-                    benefits2 = %s,
-                    benefits3 = %s,
-                    benefits4 = %s,
-                    benefits5 = %s,
-                    benefits6 = %s,
-                    benefits7 = %s,
-                    benefits8 = %s,
-                    benefits9 = %s,
-                    benefits10 = %s,
+                    benefits = JSON_OBJECT('benefits1', %s, 'benefits2', %s, 'benefits3', %s, 'benefits4', %s, 'benefits5', %s, 'benefits6', %s, 'benefits7', %s, 'benefits8', %s, 'benefits9', %s, 'benefits10', %s),
                     admission_date = %s,
                     status = %s,
                     inactive_status = %s,
                     date_of_dismissal_date = %s
                 where code = %s
-                """, (login, hashed_password, name, phone, email, cpf, birth_date_obj, gender, marital_status, address, cep, academic_formation, salary, department, position, benefits1, benefits2, benefits3, benefits4, benefits5, benefits6, benefits7, benefits8, benefits9, benefits10, admission_date_obj, status, inactive_status, date_of_dismissal_date_obj))
+                """, (login, hashed_password, name, phone, email, cpf, birth_date_obj, gender, marital_status, address, cep, academic_formation, salary, department, position, json.dumps(benefits), admission_date_obj, status, inactive_status, date_of_dismissal_date_obj))
                 mysql.connection.commit()
                 close_cursor(cursor)
                 return jsonify(success=True, message="Funcionário atualizado com sucesso.")
             else:
                 cursor.execute("""
-                    INSERT INTO employees (code, login, password, name, phone, email, cpf, birth_date, gender, marital_status, address, cep, academic_formation, salary, department, position, benefits1, benefits2, benefits3, benefits4, benefits5, benefits6, benefits7, benefits8, benefits9, benefits10, admission_date, status, inactive_status, date_of_dismissal_date)
-                """, (code, login, hashed_password, name, phone, email, cpf, birth_date_obj, gender, marital_status, address, cep, academic_formation, salary, department, position, benefits1, benefits2, benefits3, benefits4, benefits5, benefits6, benefits7, benefits8, benefits9, benefits10, admission_date_obj, status, inactive_status, date_of_dismissal_date_obj))
+                    INSERT INTO employees (code, login, password, name, phone, email, cpf, birth_date, gender, marital_status, address, cep, academic_formation, salary, department, position, benefits, admission_date, status, inactive_status, date_of_dismissal_date)
+                """, (code, login, hashed_password, name, phone, email, cpf, birth_date_obj, gender, marital_status, address, cep, academic_formation, salary, department, position, json.dumps(benefits), admission_date_obj, status, inactive_status, date_of_dismissal_date_obj))
                 mysql.connection.commit()
                 close_cursor(cursor)
                 return jsonify(success=True, message="Funcionário cadastrado com sucesso.")
