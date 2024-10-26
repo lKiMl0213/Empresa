@@ -32,7 +32,7 @@ pip install -r requirements.txt
 then you can run the project using:
 
 ```
-python main.py
+python app.py
 ```
 
 Some names are in portuguese because it's a brazilian project, i'm sorry for that.
