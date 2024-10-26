@@ -1,6 +1,7 @@
 #Empresa
-To run this project you will need to install mysql and configure the .env file with your database credentials.
-You can use, and i recommend, docker compose to run the mysql database.
+To run this project you will need to install mysql and configure based on the ".env" file.
+
+You can use, and i recommend, docker compose to run the "mysql" database.
 
 To use docker compose, you will need to have docker installed (https://www.docker.com/).
 
