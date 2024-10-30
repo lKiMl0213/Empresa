@@ -19,7 +19,7 @@
                 <h1>Bem-vindo <span id="user"></span> ao RH</h1>
                 <button id="logoutButton">Sair</button>
             </div>
-            <button class="button-action" onclick="showEmployees()">Ver Todos os Funcionários</button>
+            <button class="button-action" onclick="show_employees()">Ver Todos os Funcionários</button>
         </div>
         <!-- Formulário de Registro -->
         <div class="form-container" id="formContainer" style="display:none;">
@@ -396,7 +396,7 @@
                             </select>
                         </div>
                         <div class="form-section" id="buttonsContainer" style="display:none;">
-                            <button type="button" onclick="addEmployee()">Salvar</button>
+                            <button type="button" onclick="add_employee()">Salvar</button>
                         </div>
                         <div id="employeeListContainer" style="display:none;"></div>
             </form>
@@ -615,13 +615,13 @@
         }
 
 
-        function showEmployees() {
-            loadEmployees();
+        function show_employees() {
+            load_employees();
             $('#formContainer').hide();
             $('#employeeListContainer').show();
         }
 
-        function loadEmployees() {
+        function load_employees() {
             $.ajax({
                 url: '{{ url_for('rh_management.manage_employee') }}?action=list_employees',
                 type: 'GET',
@@ -679,7 +679,7 @@
                 }
             });
         }
-        function addEmployee() {
+        function add_employee() {
             const form = $('#employeeForm');
             const formData = new FormData(form[0]);
             $.ajax({
@@ -700,7 +700,7 @@
                 }
             });
         }
-        function checkCode(code) {
+        function check_code(code) {
             if (code) {
                 codes = code;
             } else {
