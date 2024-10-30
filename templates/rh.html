@@ -14,12 +14,12 @@
     <div class="rh-page">
         <!-- Barra Superior -->
         <div class="upper-bar">
-            <button class="button-action" onclick="setupForm()">Gerenciar RH</button>
+            <button onclick="setupForm()">Gerenciar RH</button>
             <div class="welcome-section">
                 <h1>Bem-vindo <span id="user"></span> ao RH</h1>
                 <button id="logoutButton">Sair</button>
             </div>
-            <button class="button-action" onclick="showProducts()">Ver Todos os Funcionários</button>
+            <button class="button-action" onclick="showEmployees()">Ver Todos os Funcionários</button>
         </div>
         <!-- Formulário de Registro -->
         <div class="form-container" id="formContainer" style="display:none;">
@@ -136,7 +136,7 @@
                             </select>
                             <select name="birthdayYear" required>
                                 <option value="">Ano</option>
-                                {% for year in range(2024, 2040) %}
+                                {% for year in range(1900, 2024) %}
                                 <option value="{{ year }}">{{ year }}</option>
                                 {% endfor %}
                             </select>
@@ -349,15 +349,6 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="gender">Sexo:</label>
-                        <select name="gender" required>
-                            <option value="">Sexo</option>
-                            <option value="Masculino">Masculino</option>
-                            <option value="Feminino">Feminino</option>
-                            <option value="Outro">Outro</option>
-                        </select>
-                    </div>
                     <div class="form-section">
                         <label for="employeeStatus">Status:</label>
                         <select name="status" required>
@@ -367,13 +358,6 @@
                             <option value="sick">Doente</option>
                             <option value="inactive">Inativo</option>
                         </select>
-                        <div class="form-section">
-                            <select name="inactiveStatus">
-                                <option value="">Motivo da Inativação</option>
-                                <option value="resignation">Demissão</option>
-                                <option value="fired">Desligamento</option>
-                            </select>
-                        </div>
                         <div class="form-section">
                             <label for="dateOfDismissal">Data de Demissão:</label>
                             <div class="select-container-data" required>
@@ -412,8 +396,9 @@
                             </select>
                         </div>
                         <div class="form-section" id="buttonsContainer" style="display:none;">
-                            <button type="submit" class="btn-primary">Salvar</button>
+                            <button type="button" onclick="addEmployee()">Salvar</button>
                         </div>
+                        <div id="employeeListContainer" style="display:none;"></div>
             </form>
         </div>
     </div>
@@ -559,6 +544,7 @@
             $('#formContainer').show();
             $('#employeeListContainer').hide();
             $('#employeeForm')[0].reset();
+            $('#buttonsContainer').show();
         }
 
         function showMessage(message) {
@@ -618,11 +604,20 @@
             }
         }
 
+        function statusChecker(status) {
+            if (status === 'inactive') {
+                $('#dateOfDismissal').show();
+            } else if (status === 'on_vacation' || status === 'sick') {
+                pass
+            } else {
+                $('#dateOfDismissal').hide();
+            }
+        }
+
 
         function showEmployees() {
             loadEmployees();
             $('#formContainer').hide();
-            $('#employeeForm')[0].reset();
             $('#employeeListContainer').show();
         }
 
@@ -645,6 +640,7 @@
                             '<th>Departamento</th>' +
                             '<th>Cargo</th>' +
                             '<th>Status</th>' +
+                            '<th>Ações</th>' +
                             '</tr>' +
                             '</thead>' +
                             '<tbody>' +
