@@ -1,13 +1,59 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>Mercado</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='market.css') }}">
+    <title>Market</title>
 </head>
 <body>
-    <h1>Bem-vindo à Tela de Mercado</h1>
-    <a href="{{ url_for('home') }}">Voltar para a tela inicial</a>
+    <div class="market-page">
+        <h1> Bem-Vindo ao mercado.<br>Atentende: <span id=user"></span> </h1>
+        <div class="top-menu">
+            <button id="check_price">Verificar Preço<br>F</button>
+            <button id="start_sell">Iniciar Venda<br>V</button>
+            <button id="cancel_item">Cancelar Item<br>C</button>
+            <button id="close_cash_register">Fechar Caixa<br>Ç</button>
+        </div>
+        <div class="sell" style="display:none">
+            <label>Quantidade:</label> <input type="number" id="quantity">
+            <label>Código de Barras:</label><input type="text" id="barcode">
+            <div id="sell-form">
+                <label>Lista de produtos:</label> <p id="items-on-cart"></p>
+                <label>Valor unitário:</label> <p id="unit-price"></p>
+                <label>Total do item:</label> <p id="total-item"></p>
+                <label>Subtotal:</label> <p id="subtotal"></p>
+                <label>Total:</label> <p id="total-sell"></p>
+            </div>
+            <div id="payment" style="display:none">
+                <label>Métodos de pagamento:</label>
+                <button id="card">Cartão<br>C</button>
+                <button id="card1" style="display:none">Débito<br>[1]</button>
+                <button id="card2" style="display:none">Crédito<br>[2]</button>
+                <button id="card3" style="display:none">Refeição/Alimentação<br>[3]</button>
+                <button id="money">Dinheiro/Pix<br>D</button>
+                <button id="money" style="display:none">Dinheiro<br>[1]</button>
+                <button id="pix" style="display:none">PIX<br>[2]</button>
+                <div id="to_pay">
+                <label> Total pago:</label> <input type="text" id="paid">
+                <label> Restante à pagar:</label> <p id="lef-to-pay"></p>
+                </div>
+            </div>
+        </div>
+        <div class="cancel-item" style="display:none">
+            <label>Código de barras:</label> <input type="text" id="barcode">
+        </div>
+        <div class="close_cash_register" style="display:none">
+            <label>Fim do expediente!</label>
+            <label>Total de Vendas:</label> <p id="total-sales"></p>
+            <label>Total em Débito:</label> <p id="total-debit"></p>
+            <label>Total em Crédito:</label> <p id="total-credit"></p>
+            <label>Total em Dinheiro:</label> <p id="total-money"></p>
+            <label>Total em Pix:</label> <p id="total-pix"></p>
+            <label>Troco Inicial:</label> <p id="inical-exchange"></p>
+            <label>Troco Deixado:</label> <p id="left-exchange"></p>
+        </div>
+
 </body>
 </html>
