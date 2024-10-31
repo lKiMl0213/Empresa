@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, render_template
 from flask_mysqldb import MySQL
 from passlib.hash import scrypt
 import datetime
-
+from time import time
 rh_management_bp = Blueprint('rh_management', __name__)
 
 mysql = MySQL()
@@ -18,7 +18,7 @@ def manage_employee():
     if request.method == 'GET':
         action = request.args.get('action')
         if not action:
-            return render_template('rh.html')
+            return render_template('rh.html', time=int(time()))
         if action == 'check_code':
             code = request.args.get('code')
             cursor = get_cursor()
@@ -104,7 +104,7 @@ def manage_employee():
     elif request.method == 'POST':
         action = request.args.get('action')
         if not action:
-            return render_template('rh.html')
+            return render_template('rh.html', context={"time":time()})
         if action == 'add_employee':
             data = request.form
             code = data.get('code')
