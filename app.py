@@ -6,7 +6,7 @@ from rh_management import rh_management_bp
 from dotenv import load_dotenv
 from passlib.hash import scrypt
 import os
-
+from time import time
 load_dotenv()
 
 app = Flask(__name__)
@@ -29,7 +29,7 @@ def home():
 
 @app.route('/market')
 def market():
-    return render_template('market.html')
+    return render_template('market.html', time=int(time()))
 
 if __name__ == "__main__":
     app.run(debug=True)

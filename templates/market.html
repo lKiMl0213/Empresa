@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,40 +8,49 @@
 </head>
 <body>
     <div class="market-page">
-        <h1> Bem-Vindo ao mercado.<br>Atentende: <span id=user"></span> </h1>
+        <h1> Bem-Vindo ao mercado.<br>Atendente: <span id="user"></span> </h1>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="width: 300px; height: 300px;">
+        </div>
         <div class="top-menu">
             <button id="check_price">Verificar Preço<br>F</button>
             <button id="start_sell">Iniciar Venda<br>V</button>
             <button id="cancel_item">Cancelar Item<br>C</button>
             <button id="close_cash_register">Fechar Caixa<br>Ç</button>
         </div>
+        <!-- Conteúdo das seções (exibir/ocultar) -->
+        <div class="check_price" style="display:none">
+            <label>Código de barras:</label> <input type="text" id="barcode_check">
+            <button id="check_price_button">Verificar</button>
+            <label>Nome do produto:</label> <p id="product-name"></p>
+            <label>Preço:</label> <p id="price"></p>
+        </div>
         <div class="sell" style="display:none">
-            <label>Quantidade:</label> <input type="number" id="quantity">
-            <label>Código de Barras:</label><input type="text" id="barcode">
+            <label>Quantidade:</label> <input type="number" id="quantity" value="1" min="1">
+            <label>Código de barras:</label> <input type="text" id="barcode">
+            <button id="add_item">Adicionar</button>
             <div id="sell-form">
                 <label>Lista de produtos:</label> <p id="items-on-cart"></p>
+                <label>Nome do produto:</label> <p id="product-name"></p>
                 <label>Valor unitário:</label> <p id="unit-price"></p>
                 <label>Total do item:</label> <p id="total-item"></p>
                 <label>Subtotal:</label> <p id="subtotal"></p>
                 <label>Total:</label> <p id="total-sell"></p>
-            </div>
-            <div id="payment" style="display:none">
-                <label>Métodos de pagamento:</label>
-                <button id="card">Cartão<br>C</button>
-                <button id="card1" style="display:none">Débito<br>[1]</button>
-                <button id="card2" style="display:none">Crédito<br>[2]</button>
-                <button id="card3" style="display:none">Refeição/Alimentação<br>[3]</button>
-                <button id="money">Dinheiro/Pix<br>D</button>
-                <button id="money" style="display:none">Dinheiro<br>[1]</button>
-                <button id="pix" style="display:none">PIX<br>[2]</button>
-                <div id="to_pay">
-                <label> Total pago:</label> <input type="text" id="paid">
-                <label> Restante à pagar:</label> <p id="lef-to-pay"></p>
+                <div id="payment" style="display:none">
+                    <label>Métodos de pagamento:</label>
+                    <button id="card">Cartão<br>C</button>
+                    <button id="card1" style="display:none">Débito<br>[1]</button>
+                    <button id="card2" style="display:none">Crédito<br>[2]</button>
+                    <button id="card3" style="display:none">Refeição/Alimentação<br>[3]</button>
+                    <button id="money">Dinheiro/Pix<br>D</button>
+                    <button id="money1" style="display:none">Dinheiro<br>[1]</button>
+                    <button id="pix" style="display:none">PIX<br>[2]</button>
+                    <div id="to_pay">
+                        <label>Total pago:</label> <input type="text" id="paid">
+                        <label>Restante a pagar:</label> <p id="left-to-pay"></p>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="cancel-item" style="display:none">
-            <label>Código de barras:</label> <input type="text" id="barcode">
         </div>
         <div class="close_cash_register" style="display:none">
             <label>Fim do expediente!</label>
@@ -51,9 +59,12 @@
             <label>Total em Crédito:</label> <p id="total-credit"></p>
             <label>Total em Dinheiro:</label> <p id="total-money"></p>
             <label>Total em Pix:</label> <p id="total-pix"></p>
-            <label>Troco Inicial:</label> <p id="inical-exchange"></p>
+            <label>Troco Inicial:</label> <p id="initial-exchange"></p>
             <label>Troco Deixado:</label> <p id="left-exchange"></p>
+            <button id="close_cash_register_button">Fechar</button>
         </div>
+    </div>
 
+    <script src="{{ url_for('static', filename='script/market.js') }}"></script>
 </body>
 </html>

@@ -16,11 +16,11 @@ You can import the schema to your database using the following command:
 
 
 ```
-mysql -u root -p empresa < db/empresa_db.sql
+mysql -u root -p empresa_db < db/empresa_db.sql
 
 or using docker compose with mysql running in a container:
 
-docker exec -i container_name mysql -u root -p empresa < db/empresa_db.sql
+docker exec -i container_name mysql -u root -p empresa_db < db/empresa_db.sql
 
 ```
 After that, on terminal you run this command to install the dependencies and run the project:
